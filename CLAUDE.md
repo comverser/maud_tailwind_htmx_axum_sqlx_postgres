@@ -14,11 +14,9 @@ This is a **template repository** for web applications. Keep all views and UI mi
 
 ### HTMX Usage Policy
 
-- Prefer standard HTML forms and links when possible
-- Use HTMX only when:
-  - Standard HTML cannot accomplish the task
-  - HTMX provides significantly better UX
-  - Action requires non-standard HTTP methods on non-form elements
+- Use HTMX to enable RESTful patterns (DELETE, PATCH, PUT) from HTML forms
+- Progressive enhancement: forms should work with or without HTMX when practical
+- Use HTMX for improved UX: partial page updates, optimistic UI, etc.
 
 ## Code Style
 
@@ -27,17 +25,42 @@ This is a **template repository** for web applications. Keep all views and UI mi
 - Minimize symbol visibility: prefer private unless public is required
 - **Don't care about backward compatibility**: This is a template in active development - breaking changes are acceptable for improvements
 
+## Routing & API Design
+
+- **Type-first organization**: Routes organized by interaction type (`/forms/*`, `/actions/*`, `/pages/*`)
+- **RESTful within type**: Use proper HTTP methods (DELETE, PATCH, PUT) and path parameters for resources
+- **Path parameters for resource identification**: `/forms/todos/{todo_id}` instead of `todo_id` in body
+
+### Route Structure Examples
+
+```http
+Pages (GET only):
+  GET /              → get_root
+  GET /todos         → get_todos
+  GET /sign_in       → get_sign_in
+
+Forms (with form data):
+  POST   /forms/sign_in                    → post_forms_sign_in
+  POST   /forms/todos                      → post_forms_todos
+  POST   /forms/todos/{todo_id}/toggle     → post_forms_todos_todo_id_toggle
+
+Actions (state changes, typically no form data):
+  POST   /actions/sign_out                 → post_actions_sign_out
+  DELETE /actions/todos/{todo_id}          → delete_actions_todos_todo_id
+```
+
 ## Naming
 
 - Improve naming for files, functions, variables, and identifiers
 - Use `snake_case` for URLs (with underscores)
-- HTTP handler names follow the pattern: `method_endpoint`
-  - Endpoint derived from route path: static segments as-is, path params as `{resource}_id`, joined with underscores
-  - Examples:
-    - `/forms/sign_in` → `post_forms_sign_in`
-    - `/actions/sign_out` → `post_actions_sign_out`
-    - `/todos` → `get_todos`
-- Module structure mirrors route structure
-  - Form handlers in `handlers/forms/` for `/forms/*` routes
-  - Action handlers in `handlers/actions/` for `/actions/*` routes
-  - Page handlers in `handlers/pages/` for page routes
+- HTTP handler names follow the pattern: `method_type_resource_[param]_[action]`
+  - Examples shown in routing section above
+- Module structure mirrors route type structure
+  - Form handlers in `handlers/forms/`
+  - Action handlers in `handlers/actions/`
+  - Page handlers in `handlers/pages/`
+
+## Path Management
+
+- **No hardcoded paths** - All paths must be defined in the `paths` module
+- **Single source of truth** - All URL structure lives in `src/paths.rs`

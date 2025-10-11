@@ -4,7 +4,7 @@ mod todo;
 
 pub use sign_in::post_forms_sign_in;
 pub use sign_up::post_forms_sign_up;
-pub use todo::{post_forms_create_todo, post_forms_delete_todo, post_forms_toggle_todo};
+pub use todo::{post_forms_todos, post_forms_todos_todo_id_toggle};
 
 use std::collections::HashMap;
 

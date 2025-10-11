@@ -11,6 +11,5 @@ pub fn public_page_routes() -> Router<AppState> {
 
 pub fn protected_page_routes() -> Router<AppState> {
     Router::new()
-        .route(paths::pages::CREATE, get(pages::get_create))
         .route(paths::pages::TODOS, get(pages::get_todos))
 }

@@ -9,7 +9,6 @@ pub fn public_form_routes() -> Router<AppState> {
 
 pub fn protected_form_routes() -> Router<AppState> {
     Router::new()
-        .route(relative::CREATE_TODO, post(forms::post_forms_create_todo))
-        .route(relative::TOGGLE_TODO, post(forms::post_forms_toggle_todo))
-        .route(relative::DELETE_TODO, post(forms::post_forms_delete_todo))
+        .route(relative::TODOS, post(forms::post_forms_todos))
+        .route(relative::TODOS_TODO_ID_TOGGLE, post(forms::post_forms_todos_todo_id_toggle))
 }

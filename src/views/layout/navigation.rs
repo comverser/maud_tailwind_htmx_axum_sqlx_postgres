@@ -10,7 +10,6 @@ pub fn navbar(current_user: &CurrentUser) -> Markup {
                         a href=(paths::pages::ROOT) class="hover:text-blue-600 transition-colors" { "Home" }
                         @match current_user {
                             CurrentUser::Authenticated { .. } => {
-                                a href=(paths::pages::CREATE) class="hover:text-blue-600 transition-colors" { "Create" }
                                 a href=(paths::pages::TODOS) class="hover:text-blue-600 transition-colors" { "Todos" }
                                 form method="post" action=(paths::actions::SIGN_OUT) class="inline" {
                                     button type="submit" class="hover:text-blue-600 transition-colors" { "Sign Out" }

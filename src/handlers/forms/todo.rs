@@ -1,4 +1,4 @@
-use axum::{Extension, Form, extract::State, http::StatusCode, response::{IntoResponse, Redirect, Response}};
+use axum::{Extension, Form, extract::{Path, State}, http::StatusCode, response::{IntoResponse, Redirect, Response}};
 use sqlx::PgPool;
 use tower_sessions::Session;
 use validator::Validate;
@@ -7,7 +7,7 @@ use crate::{
     auth::CurrentUser,
     data::commands,
     flash::FlashMessage,
-    handlers::dtos::todo::{CreateTodoForm, TodoIdForm, FIELD_TASK},
+    handlers::dtos::todo::{CreateTodoForm, FIELD_TASK},
     handlers::errors::HandlerError,
     paths::pages,
     views::pages::todos,
@@ -15,7 +15,7 @@ use crate::{
 
 use super::parse_validation_errors;
 
-pub async fn post_forms_create_todo(
+pub async fn post_forms_todos(
     State(db): State<PgPool>,
     Extension(current_user): Extension<CurrentUser>,
     session: Session,
@@ -32,27 +32,14 @@ pub async fn post_forms_create_todo(
     Ok(Redirect::to(pages::TODOS).into_response())
 }
 
-pub async fn post_forms_toggle_todo(
+pub async fn post_forms_todos_todo_id_toggle(
     State(db): State<PgPool>,
     Extension(current_user): Extension<CurrentUser>,
-    Form(form): Form<TodoIdForm>,
+    Path(todo_id): Path<i32>,
 ) -> Result<Response, HandlerError> {
     let user_id = current_user.require_authenticated();
 
-    commands::todo::toggle_todo(&db, user_id, form.todo_id).await?;
-    Ok(Redirect::to(pages::TODOS).into_response())
-}
-
-pub async fn post_forms_delete_todo(
-    State(db): State<PgPool>,
-    Extension(current_user): Extension<CurrentUser>,
-    session: Session,
-    Form(form): Form<TodoIdForm>,
-) -> Result<Response, HandlerError> {
-    let user_id = current_user.require_authenticated();
-
-    commands::todo::delete_todo(&db, user_id, form.todo_id).await?;
-    FlashMessage::success("Todo deleted successfully").set(&session).await?;
+    commands::todo::toggle_todo(&db, user_id, todo_id).await?;
     Ok(Redirect::to(pages::TODOS).into_response())
 }
 

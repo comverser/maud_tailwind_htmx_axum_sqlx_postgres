@@ -18,7 +18,7 @@ pub fn todos(
         div class="max-w-2xl mx-auto" {
             h1 class="text-2xl font-bold mb-6" { "Todos" }
 
-            form method="POST" action=(paths::forms::CREATE_TODO) class="mb-6 space-y-4" {
+            form method="POST" action=(paths::forms::TODOS) class="mb-6 space-y-4" {
                 (form::input("text", FIELD_TASK, "New Todo", task_value, task_error))
                 (form::submit_button("Add Todo"))
             }
@@ -28,9 +28,12 @@ pub fn todos(
             } @else {
                 ul class="space-y-2" {
                     @for todo in todos {
-                        li class="flex items-center gap-3 p-3 bg-white border rounded-lg" {
-                            form method="POST" action=(paths::forms::TOGGLE_TODO) class="flex-shrink-0" {
-                                input type="hidden" name="todo_id" value=(todo.todo_id);
+                        li class="flex items-center gap-3 p-3 bg-white border rounded-lg" id={"todo-" (todo.todo_id)} {
+                            form
+                                method="POST"
+                                action={(paths::forms::TODOS_TODO_ID_TOGGLE.replace("{todo_id}", &todo.todo_id.to_string()))}
+                                class="flex-shrink-0"
+                            {
                                 input
                                     type="checkbox"
                                     checked[todo.is_done]
@@ -45,8 +48,13 @@ pub fn todos(
                                 (todo.task)
                             }
 
-                            form method="POST" action=(paths::forms::DELETE_TODO) class="flex-shrink-0" {
-                                input type="hidden" name="todo_id" value=(todo.todo_id);
+                            form
+                                hx-delete={(paths::actions::TODOS_TODO_ID.replace("{todo_id}", &todo.todo_id.to_string()))}
+                                hx-confirm="Are you sure you want to delete this todo?"
+                                hx-target={"#todo-" (todo.todo_id)}
+                                hx-swap="outerHTML"
+                                class="flex-shrink-0"
+                            {
                                 button
                                     type="submit"
                                     class="text-red-600 hover:text-red-800 px-2 py-1"

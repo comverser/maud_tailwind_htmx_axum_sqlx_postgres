@@ -36,7 +36,10 @@ macro_rules! define_nested_routes {
             $(pub const $name: &str = $path;)*
         }
 
-        $(pub const $name: &str = concat!($base, $path);)*
+        $(
+            #[allow(dead_code)]
+            pub const $name: &str = concat!($base, $path);
+        )*
     };
 }
 
@@ -45,7 +48,6 @@ pub mod pages {
     pub const SIGN_UP: &str = "/sign_up";
     pub const SIGN_IN: &str = "/sign_in";
     pub const ABOUT: &str = "/about";
-    pub const CREATE: &str = "/create";
     pub const TODOS: &str = "/todos";
 }
 
@@ -53,15 +55,15 @@ pub mod forms {
     define_nested_routes!("/forms", {
         SIGN_UP => "/sign_up",
         SIGN_IN => "/sign_in",
-        CREATE_TODO => "/create_todo",
-        TOGGLE_TODO => "/toggle_todo",
-        DELETE_TODO => "/delete_todo",
+        TODOS => "/todos",
+        TODOS_TODO_ID_TOGGLE => "/todos/{todo_id}/toggle",
     });
 }
 
 pub mod actions {
     define_nested_routes!("/actions", {
         SIGN_OUT => "/sign_out",
+        TODOS_TODO_ID => "/todos/{todo_id}",
     });
 }
 

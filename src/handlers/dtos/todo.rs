@@ -9,11 +9,6 @@ pub struct CreateTodoForm {
     pub task: String,
 }
 
-#[derive(Deserialize)]
-pub struct TodoIdForm {
-    pub todo_id: i32,
-}
-
 pub struct Todo {
     pub todo_id: i32,
     pub task: String,
