@@ -24,6 +24,8 @@ async fn main() {
         .await
         .unwrap();
 
+    tracing::info!("Server listening on {}", config.server_addr);
+
     let app = routes::create_routes(state, session_layer);
 
     axum::serve(listener, app).await.unwrap();

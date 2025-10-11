@@ -66,4 +66,4 @@ tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
 dotenvy = "0.15.7"
 
 ## Utilities
-regex = "1.11.3"
+regex = "1.12.1"

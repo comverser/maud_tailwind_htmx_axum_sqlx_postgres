@@ -25,6 +25,7 @@ This is a **template repository** for web applications. Keep all views and UI mi
 - Follow modern Rust conventions
 - **Single standard principle**: Maintain exactly one way to accomplish each task - avoid creating multiple functions or patterns for the same purpose
 - Minimize symbol visibility: prefer private unless public is required
+- **Don't care about backward compatibility**: This is a template in active development - breaking changes are acceptable for improvements
 
 ## Naming
 

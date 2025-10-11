@@ -8,7 +8,7 @@ pub use todo::{post_forms_create_todo, post_forms_delete_todo, post_forms_toggle
 
 use std::collections::HashMap;
 
-fn parse_validation_errors(
+pub(super) fn parse_validation_errors(
     validation_errors: &validator::ValidationErrors,
 ) -> HashMap<String, String> {
     validation_errors
