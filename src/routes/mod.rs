@@ -13,6 +13,7 @@ pub fn create_routes(state: AppState, session_layer: SessionManagerLayer<Postgre
     Router::new()
         .nest_service(paths::static_files::BASE, ServeDir::new("static"))
         .merge(app_routes(state, session_layer))
+        .layer(middleware::from_fn(middlewares::security_headers))
         .layer(middlewares::create_http_trace_layer())
 }
 
