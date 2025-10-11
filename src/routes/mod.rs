@@ -1,5 +1,3 @@
-mod http_tracing;
-
 mod actions;
 mod forms;
 mod pages;
@@ -10,13 +8,12 @@ use tower_sessions::SessionManagerLayer;
 use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::{config::AppState, handlers, middlewares, paths};
-use http_tracing::create_http_trace_layer;
 
 pub fn create_routes(state: AppState, session_layer: SessionManagerLayer<PostgresStore>) -> Router {
     Router::new()
         .nest_service(paths::static_files::BASE, ServeDir::new("static"))
         .merge(app_routes(state, session_layer))
-        .layer(create_http_trace_layer())
+        .layer(middlewares::create_http_trace_layer())
 }
 
 fn app_routes(state: AppState, session_layer: SessionManagerLayer<PostgresStore>) -> Router {

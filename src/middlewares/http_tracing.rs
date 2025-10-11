@@ -1,10 +1,7 @@
 use std::time::Duration;
 
-use axum::{body::Body, extract::Request, http::Response};
-use tower::{
-    ServiceBuilder,
-    layer::util::{Identity, Stack},
-};
+use axum::{body::Body, extract::{ConnectInfo, Request}, http::Response};
+use tower::{ServiceBuilder, layer::util::{Identity, Stack}};
 use tower_http::{
     classify::{ServerErrorsAsFailures, ServerErrorsFailureClass, SharedClassifier},
     trace::{DefaultOnBodyChunk, DefaultOnEos, TraceLayer},
@@ -26,7 +23,7 @@ type HttpTraceLayer = ServiceBuilder<
     >,
 >;
 
-pub(super) fn create_http_trace_layer() -> HttpTraceLayer {
+pub fn create_http_trace_layer() -> HttpTraceLayer {
     ServiceBuilder::new().layer(
         TraceLayer::new_for_http()
             .make_span_with(make_span as fn(&Request<Body>) -> Span)
@@ -37,8 +34,15 @@ pub(super) fn create_http_trace_layer() -> HttpTraceLayer {
 }
 
 fn on_request(request: &Request<Body>, _: &Span) {
+    let client_ip = request
+        .extensions()
+        .get::<ConnectInfo<std::net::SocketAddr>>()
+        .map(|ConnectInfo(addr)| addr.ip().to_string())
+        .unwrap_or_else(|| "unknown".to_string());
+
     tracing::info!(
-        "-> Request started: method {} path {}",
+        "-> Request started: client {} method {} path {}",
+        client_ip,
         request.method(),
         request.uri().path()
     );

@@ -26,7 +26,8 @@ async fn main() {
 
     tracing::info!("Server listening on {}", config.server_addr);
 
-    let app = routes::create_routes(state, session_layer);
+    let app = routes::create_routes(state, session_layer)
+        .into_make_service_with_connect_info::<std::net::SocketAddr>();
 
     axum::serve(listener, app).await.unwrap();
 }
