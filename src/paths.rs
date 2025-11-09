@@ -45,7 +45,6 @@ macro_rules! define_nested_routes {
 
 pub mod pages {
     pub const ROOT: &str = "/";
-    pub const SIGN_UP: &str = "/sign_up";
     pub const SIGN_IN: &str = "/sign_in";
     pub const ABOUT: &str = "/about";
     pub const TODOS: &str = "/todos";
@@ -53,7 +52,6 @@ pub mod pages {
 
 pub mod forms {
     define_nested_routes!("/forms", {
-        SIGN_UP => "/sign_up",
         SIGN_IN => "/sign_in",
         TODOS => "/todos",
         TODOS_TODO_ID_TOGGLE => "/todos/{todo_id}/toggle",
@@ -63,6 +61,7 @@ pub mod forms {
 pub mod actions {
     define_nested_routes!("/actions", {
         SIGN_OUT => "/sign_out",
+        VERIFY_MAGIC_LINK => "/auth/verify",
         TODOS_TODO_ID => "/todos/{todo_id}",
     });
 }

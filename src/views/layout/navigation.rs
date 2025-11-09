@@ -16,7 +16,6 @@ pub fn navbar(current_user: &CurrentUser) -> Markup {
                                 }
                             }
                             CurrentUser::Guest => {
-                                a href=(paths::pages::SIGN_UP) class="hover:text-blue-600 transition-colors" { "Sign Up" }
                                 a href=(paths::pages::SIGN_IN) class="hover:text-blue-600 transition-colors" { "Sign In" }
                             }
                         }

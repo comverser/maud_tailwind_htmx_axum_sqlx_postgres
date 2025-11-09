@@ -1,52 +1,57 @@
-use axum::{
-    Extension,
-    Form,
-    extract::State,
-    http::StatusCode,
-    response::{IntoResponse, Redirect, Response},
-};
+use axum::{Extension, Form, extract::State, http::StatusCode, response::{IntoResponse, Redirect, Response}};
 use sqlx::PgPool;
-use tower_sessions::Session;
 use validator::Validate;
 
 use crate::{
-    auth::{CurrentUser, SESSION_USER_ID_KEY},
-    data::queries,
+    auth::CurrentUser,
+    data::commands,
+    email::{self, EmailConfig},
     flash::FlashMessage,
-    handlers::dtos::user::{FIELD_EMAIL, FIELD_PASSWORD, SignInForm},
-    paths::pages,
+    handlers::dtos::user::{FIELD_EMAIL, MagicLinkRequestForm},
+    magic_link,
+    paths,
     views::pages::sign_in,
 };
+use tower_sessions::Session;
 
 use super::parse_validation_errors;
 
+/// Handle magic link request - sends an email with a sign-in link
 pub async fn post_forms_sign_in(
     State(db): State<PgPool>,
     Extension(current_user): Extension<CurrentUser>,
     session: Session,
-    Form(form): Form<SignInForm>,
+    Form(form): Form<MagicLinkRequestForm>,
 ) -> Result<Response, crate::handlers::errors::HandlerError> {
     if let Err(validation_errors) = form.validate() {
         return Ok(render_validation_errors(&current_user, &form, &validation_errors));
     }
 
-    match queries::user::authenticate_user(&db, &form.email, &form.password).await {
-        Ok(user_id) => {
-            session.insert(SESSION_USER_ID_KEY, user_id).await?;
-            FlashMessage::success("Successfully signed in!").set(&session).await?;
-            Ok(Redirect::to(pages::ROOT).into_response())
-        }
-        Err(crate::data::errors::DataError::Unauthorized(msg)) => {
-            FlashMessage::error(msg).set(&session).await?;
-            Ok(Redirect::to(pages::SIGN_IN).into_response())
-        }
-        Err(err) => Err(err.into()),
+    // Generate magic link token
+    let token = magic_link::generate_token();
+
+    // Store the magic link in database
+    commands::magic_link::create_magic_link(&db, &form.email, &token).await?;
+
+    // Send the magic link email
+    let email_config = EmailConfig::from_env();
+    if let Err(e) = email::send_magic_link(&email_config, &form.email, &token).await {
+        tracing::error!("Failed to send magic link email: {}", e);
+        FlashMessage::error("Failed to send email. Please try again.").set(&session).await?;
+        return Ok(Redirect::to(paths::pages::SIGN_IN).into_response());
     }
+
+    // Show success message
+    FlashMessage::success(
+        "Check your email! We sent you a link to sign in."
+    ).set(&session).await?;
+
+    Ok(Redirect::to(paths::pages::SIGN_IN).into_response())
 }
 
 fn render_validation_errors(
     current_user: &CurrentUser,
-    form: &SignInForm,
+    form: &MagicLinkRequestForm,
     validation_errors: &validator::ValidationErrors,
 ) -> Response {
     let errors = parse_validation_errors(validation_errors);
@@ -57,7 +62,6 @@ fn render_validation_errors(
             &None,
             Some(&form.email),
             errors.get(FIELD_EMAIL).map(String::as_str),
-            errors.get(FIELD_PASSWORD).map(String::as_str),
         ),
     )
         .into_response()

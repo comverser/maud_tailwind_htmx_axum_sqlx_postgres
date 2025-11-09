@@ -1,5 +1,10 @@
 use crate::{config::AppState, handlers::actions, paths::actions::relative};
-use axum::{Router, routing::{delete, post}};
+use axum::{Router, routing::{delete, get, post}};
+
+pub fn public_action_routes() -> Router<AppState> {
+    Router::new()
+        .route(relative::VERIFY_MAGIC_LINK, get(actions::get_actions_auth_verify))
+}
 
 pub fn protected_action_routes() -> Router<AppState> {
     Router::new()

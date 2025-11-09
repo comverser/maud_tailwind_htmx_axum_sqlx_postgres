@@ -1,9 +1,11 @@
 mod auth;
 mod config;
 mod data;
+mod email;
 mod flash;
 mod handlers;
 mod init;
+mod magic_link;
 mod middlewares;
 mod paths;
 mod routes;

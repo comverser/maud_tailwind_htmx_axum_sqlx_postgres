@@ -31,6 +31,7 @@ fn public_routes() -> Router<AppState> {
     Router::new()
         .merge(pages::public_page_routes())
         .nest(paths::forms::BASE, forms::public_form_routes())
+        .nest(paths::actions::BASE, actions::public_action_routes())
 }
 
 fn protected_routes() -> Router<AppState> {

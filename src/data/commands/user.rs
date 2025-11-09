@@ -1,29 +1,27 @@
 use crate::data::errors::DataError;
-use argon2::password_hash::{PasswordHasher, SaltString, rand_core::OsRng};
-use argon2::Argon2;
 use sqlx::PgPool;
 
-pub async fn create_user(db: &PgPool, email: &str, password: &str) -> Result<(), DataError> {
-    let salt = SaltString::generate(&mut OsRng);
-    let argon2 = Argon2::default();
-    let password_hash = argon2
-        .hash_password(password.as_bytes(), &salt)
-        .map_err(|_| DataError::Internal("Password hashing failed"))?
-        .to_string();
+/// Get or create a user by email address
+/// Returns the user_id
+pub async fn get_or_create_user(db: &PgPool, email: &str) -> Result<i32, DataError> {
+    // Try to find existing user
+    let existing = sqlx::query!("SELECT user_id FROM users WHERE email = $1", email)
+        .fetch_optional(db)
+        .await
+        .map_err(DataError::Database)?;
 
-    sqlx::query!(
-        "INSERT INTO users(email, password_hash) VALUES($1, $2)",
-        email,
-        password_hash
+    if let Some(row) = existing {
+        return Ok(row.user_id);
+    }
+
+    // Create new user if not exists
+    let row = sqlx::query!(
+        "INSERT INTO users(email) VALUES($1) RETURNING user_id",
+        email
     )
-    .execute(db)
+    .fetch_one(db)
     .await
-    .map_err(|err| match err {
-        sqlx::Error::Database(e) if e.constraint() == Some("users_email_key") => {
-            DataError::Conflict("This email address is already used")
-        }
-        e => DataError::Database(e),
-    })?;
+    .map_err(DataError::Database)?;
 
-    Ok(())
+    Ok(row.user_id)
 }
