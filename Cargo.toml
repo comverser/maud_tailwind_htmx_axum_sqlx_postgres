@@ -40,7 +40,6 @@ sqlx = { version = "0.8.6", features = [
 serde = { version = "1.0.228", features = ["derive"] }
 
 ## Date/Time
-chrono = { version = "0.4", features = ["serde"] }
 time = "0.3.44"
 
 # ============================================================================
