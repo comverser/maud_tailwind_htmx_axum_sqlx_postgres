@@ -7,8 +7,10 @@ use validator::Validate;
 // These MUST match the struct field names below for proper deserialization
 pub const FIELD_EMAIL: &str = "email";
 
-static EMAIL_RX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap());
+static EMAIL_RX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+        .expect("Email regex pattern is invalid")
+});
 
 /// Magic Link authentication form - only requires email
 #[derive(Deserialize, Validate)]

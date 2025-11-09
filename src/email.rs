@@ -1,6 +1,7 @@
 use lettre::{
-    message::header::ContentType, transport::smtp::authentication::Credentials, Message,
-    SmtpTransport, Transport,
+    message::{header::ContentType, Mailbox},
+    transport::smtp::authentication::Credentials,
+    Message, SmtpTransport, Transport,
 };
 
 #[derive(Debug, thiserror::Error)]
@@ -9,6 +10,8 @@ pub enum EmailError {
     Build(#[from] lettre::error::Error),
     #[error("Email transport error: {0}")]
     Transport(#[from] lettre::transport::smtp::Error),
+    #[error("Invalid email address: {0}")]
+    InvalidAddress(#[from] lettre::address::AddressError),
 }
 
 pub struct EmailConfig {
@@ -75,13 +78,12 @@ pub async fn send_magic_link(
 ) -> Result<(), EmailError> {
     let magic_link = format!("{}/actions/auth/verify?token={}", config.base_url, token);
 
+    let from_mailbox: Mailbox = format!("{} <{}>", config.from_name, config.from_address).parse()?;
+    let to_mailbox: Mailbox = to_email.parse()?;
+
     let email = Message::builder()
-        .from(
-            format!("{} <{}>", config.from_name, config.from_address)
-                .parse()
-                .unwrap(),
-        )
-        .to(to_email.parse().unwrap())
+        .from(from_mailbox)
+        .to(to_mailbox)
         .subject("Sign in to your account")
         .header(ContentType::TEXT_HTML)
         .body(format!(
@@ -122,7 +124,7 @@ pub async fn send_magic_link(
             username,
             password,
         } => {
-            let creds = Credentials::new(username.clone(), password.clone());
+            let creds = Credentials::new(username.to_string(), password.to_string());
             let mailer = SmtpTransport::relay(host)?
                 .port(*port)
                 .credentials(creds)

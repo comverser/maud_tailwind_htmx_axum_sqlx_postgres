@@ -33,12 +33,20 @@ async fn main() {
 
     let listener = tokio::net::TcpListener::bind(&config.server_addr)
         .await
-        .unwrap();
+        .unwrap_or_else(|e| {
+            panic!(
+                "Failed to bind to address {}: {}",
+                config.server_addr, e
+            )
+        });
 
     tracing::info!("Server listening on {}", config.server_addr);
 
     let app = routes::create_routes(state, session_layer)
         .into_make_service_with_connect_info::<std::net::SocketAddr>();
 
-    axum::serve(listener, app).await.unwrap();
+    if let Err(e) = axum::serve(listener, app).await {
+        tracing::error!("Server error: {}", e);
+        std::process::exit(1);
+    }
 }

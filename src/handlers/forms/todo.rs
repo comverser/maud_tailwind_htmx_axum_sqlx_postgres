@@ -5,7 +5,7 @@ use validator::Validate;
 
 use crate::{
     auth::CurrentUser,
-    data::commands,
+    data::{commands, queries},
     flash::FlashMessage,
     handlers::dtos::todo::{CreateTodoForm, FIELD_TASK},
     handlers::errors::HandlerError,
@@ -24,7 +24,7 @@ pub async fn post_forms_todos(
     let user_id = current_user.require_authenticated();
 
     if let Err(validation_errors) = form.validate() {
-        return Ok(render_validation_errors(&current_user, &form, &validation_errors));
+        return Ok(render_validation_errors(&db, &current_user, user_id, &form, &validation_errors).await?);
     }
 
     commands::todo::create_todo(&db, user_id, form.task.trim()).await?;
@@ -43,21 +43,25 @@ pub async fn post_forms_todos_todo_id_toggle(
     Ok(Redirect::to(pages::TODOS).into_response())
 }
 
-fn render_validation_errors(
+async fn render_validation_errors(
+    db: &PgPool,
     current_user: &CurrentUser,
+    user_id: i32,
     form: &CreateTodoForm,
     validation_errors: &validator::ValidationErrors,
-) -> Response {
+) -> Result<Response, HandlerError> {
     let errors = parse_validation_errors(validation_errors);
-    (
+    let todos_list = queries::todo::get_todos_for_user(db, user_id).await?;
+
+    Ok((
         StatusCode::BAD_REQUEST,
         todos::todos(
             current_user,
             &None,
-            vec![],
+            todos_list,
             Some(&form.task),
             errors.get(FIELD_TASK).map(String::as_str),
         ),
     )
-        .into_response()
+        .into_response())
 }
