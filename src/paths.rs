@@ -46,7 +46,6 @@ macro_rules! define_nested_routes {
 pub mod pages {
     pub const ROOT: &str = "/";
     pub const SIGN_IN: &str = "/sign_in";
-    pub const ABOUT: &str = "/about";
     pub const TODOS: &str = "/todos";
 }
 

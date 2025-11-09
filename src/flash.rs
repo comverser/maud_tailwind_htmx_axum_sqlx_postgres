@@ -44,18 +44,6 @@ impl FlashMessage {
         session.insert(FLASH_MESSAGE_KEY, self).await
     }
 
-    /// Set flash message and return a redirect response.
-    ///
-    /// This is a convenience method for the common pattern of setting a flash
-    /// message and then redirecting to another page.
-    ///
-    /// # Example
-    /// ```
-    /// FlashMessage::success("Todo created successfully")
-    ///     .set_and_redirect(&session, paths::pages::TODOS)
-    ///     .await?
-    /// ```
-    #[allow(dead_code)]
     pub async fn set_and_redirect(
         self,
         session: &tower_sessions::Session,
