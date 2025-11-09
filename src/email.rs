@@ -17,10 +17,10 @@ pub enum EmailError {
 }
 
 pub struct EmailConfig {
-    pub mode: EmailMode,
-    pub from_address: String,
-    pub from_name: String,
-    pub base_url: String,
+    mode: EmailMode,
+    from_address: String,
+    from_name: String,
+    base_url: String,
 }
 
 pub enum EmailMode {

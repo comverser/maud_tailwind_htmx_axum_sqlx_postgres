@@ -27,20 +27,20 @@ async fn main() {
     init::init_logging();
 
     let config = AppConfig::from_env();
-    let db = init::init_database(&config.database_url).await;
+    let db = init::init_database(config.database_url()).await;
     let session_layer = init::init_session(db.clone()).await;
-    let state = AppState { db };
+    let state = AppState::new(db);
 
-    let listener = tokio::net::TcpListener::bind(&config.server_addr)
+    let listener = tokio::net::TcpListener::bind(config.server_addr())
         .await
         .unwrap_or_else(|e| {
             panic!(
                 "Failed to bind to address {}: {}",
-                config.server_addr, e
+                config.server_addr(), e
             )
         });
 
-    tracing::info!("Server listening on {}", config.server_addr);
+    tracing::info!("Server listening on {}", config.server_addr());
 
     let app = routes::create_routes(state, session_layer)
         .into_make_service_with_connect_info::<std::net::SocketAddr>();

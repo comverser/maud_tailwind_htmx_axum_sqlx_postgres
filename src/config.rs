@@ -2,8 +2,8 @@ use axum::extract::FromRef;
 use sqlx::PgPool;
 
 pub struct AppConfig {
-    pub server_addr: String,
-    pub database_url: String,
+    server_addr: String,
+    database_url: String,
 }
 
 impl AppConfig {
@@ -21,9 +21,23 @@ impl AppConfig {
             database_url,
         }
     }
+
+    pub fn server_addr(&self) -> &str {
+        &self.server_addr
+    }
+
+    pub fn database_url(&self) -> &str {
+        &self.database_url
+    }
 }
 
 #[derive(Clone, FromRef)]
 pub struct AppState {
-    pub db: PgPool,
+    db: PgPool,
+}
+
+impl AppState {
+    pub fn new(db: PgPool) -> Self {
+        Self { db }
+    }
 }
