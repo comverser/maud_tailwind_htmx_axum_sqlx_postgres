@@ -46,6 +46,7 @@ pub fn swap_html(markup: Markup) -> Response {
 ///
 /// Tells HTMX to do nothing - useful for operations that don't need
 /// to update the UI (like analytics tracking).
+#[allow(dead_code)]
 pub fn no_content() -> Response {
     StatusCode::NO_CONTENT.into_response()
 }

@@ -26,6 +26,7 @@ pub(super) fn parse_validation_errors(
 ///
 /// This encapsulates the common pattern of parsing validation errors
 /// and returning them with a 400 status code.
+#[allow(dead_code)]
 pub(super) fn render_validation_error_response<F>(
     validation_errors: &validator::ValidationErrors,
     render_fn: F,

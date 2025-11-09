@@ -1,4 +1,4 @@
-use axum::{Extension, Form, extract::State, http::StatusCode, response::{IntoResponse, Redirect, Response}};
+use axum::{Extension, Form, extract::State, http::StatusCode, response::{IntoResponse, Response}};
 use sqlx::PgPool;
 use tower_sessions::Session;
 use validator::Validate;
@@ -28,8 +28,9 @@ pub async fn post_forms_todos(
     }
 
     commands::todo::create_todo(&db, user_id, form.task.trim()).await?;
-    FlashMessage::success("Todo created successfully").set(&session).await?;
-    Ok(Redirect::to(pages::TODOS).into_response())
+    Ok(FlashMessage::success("Todo created successfully")
+        .set_and_redirect(&session, pages::TODOS)
+        .await?)
 }
 
 async fn render_validation_errors(

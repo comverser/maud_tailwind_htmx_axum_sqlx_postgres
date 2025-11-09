@@ -55,6 +55,7 @@ impl FlashMessage {
     ///     .set_and_redirect(&session, paths::pages::TODOS)
     ///     .await?
     /// ```
+    #[allow(dead_code)]
     pub async fn set_and_redirect(
         self,
         session: &tower_sessions::Session,

@@ -1,6 +1,6 @@
 use axum::{
     extract::{Query, State},
-    response::{IntoResponse, Redirect, Response},
+    response::Response,
 };
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -30,10 +30,9 @@ pub async fn get_actions_auth_verify(
     {
         Ok(email) => email,
         Err(_) => {
-            FlashMessage::error("Invalid or expired magic link. Please request a new one.")
-                .set(&session)
-                .await?;
-            return Ok(Redirect::to(paths::pages::SIGN_IN).into_response());
+            return Ok(FlashMessage::error("Invalid or expired magic link. Please request a new one.")
+                .set_and_redirect(&session, paths::pages::SIGN_IN)
+                .await?);
         }
     };
 
@@ -42,9 +41,8 @@ pub async fn get_actions_auth_verify(
 
     // Create session
     session.insert(SESSION_USER_ID_KEY, user_id).await?;
-    FlashMessage::success("Successfully signed in!")
-        .set(&session)
-        .await?;
 
-    Ok(Redirect::to(paths::pages::ROOT).into_response())
+    Ok(FlashMessage::success("Successfully signed in!")
+        .set_and_redirect(&session, paths::pages::ROOT)
+        .await?)
 }

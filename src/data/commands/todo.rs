@@ -1,4 +1,4 @@
-use crate::data::errors::DataError;
+use crate::data::{ensure_rows_affected, errors::DataError};
 use sqlx::PgPool;
 
 pub async fn create_todo(db: &PgPool, user_id: i32, task: &str) -> Result<(), DataError> {
@@ -24,11 +24,7 @@ pub async fn toggle_todo(db: &PgPool, user_id: i32, todo_id: i32) -> Result<(), 
     .await
     .map_err(DataError::Database)?;
 
-    if result.rows_affected() == 0 {
-        return Err(DataError::NotFound("Todo not found"));
-    }
-
-    Ok(())
+    ensure_rows_affected(result, "Todo not found")
 }
 
 pub async fn delete_todo(db: &PgPool, user_id: i32, todo_id: i32) -> Result<(), DataError> {
@@ -41,9 +37,5 @@ pub async fn delete_todo(db: &PgPool, user_id: i32, todo_id: i32) -> Result<(), 
     .await
     .map_err(DataError::Database)?;
 
-    if result.rows_affected() == 0 {
-        return Err(DataError::NotFound("Todo not found"));
-    }
-
-    Ok(())
+    ensure_rows_affected(result, "Todo not found")
 }

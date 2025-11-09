@@ -1,4 +1,4 @@
-use axum::{Extension, Form, extract::State, http::StatusCode, response::{IntoResponse, Redirect, Response}};
+use axum::{Extension, Form, extract::State, http::StatusCode, response::{IntoResponse, Response}};
 use sqlx::PgPool;
 use validator::Validate;
 
@@ -37,16 +37,15 @@ pub async fn post_forms_sign_in(
     let email_config = EmailConfig::from_env();
     if let Err(e) = email::send_magic_link(&email_config, &form.email, &token).await {
         tracing::error!("Failed to send magic link email: {}", e);
-        FlashMessage::error("Failed to send email. Please try again.").set(&session).await?;
-        return Ok(Redirect::to(paths::pages::SIGN_IN).into_response());
+        return Ok(FlashMessage::error("Failed to send email. Please try again.")
+            .set_and_redirect(&session, paths::pages::SIGN_IN)
+            .await?);
     }
 
     // Show success message
-    FlashMessage::success(
-        "Check your email! We sent you a link to sign in."
-    ).set(&session).await?;
-
-    Ok(Redirect::to(paths::pages::SIGN_IN).into_response())
+    Ok(FlashMessage::success("Check your email! We sent you a link to sign in.")
+        .set_and_redirect(&session, paths::pages::SIGN_IN)
+        .await?)
 }
 
 fn render_validation_errors(
