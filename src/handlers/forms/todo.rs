@@ -24,7 +24,7 @@ pub async fn post_forms_todos(
     let user_id = current_user.require_authenticated();
 
     if let Err(validation_errors) = form.validate() {
-        return Ok(render_validation_errors(&db, &current_user, user_id, &form, &validation_errors).await?);
+        return render_validation_errors(&db, &current_user, user_id, &form, &validation_errors).await;
     }
 
     commands::todo::create_todo(&db, user_id, form.task.trim()).await?;

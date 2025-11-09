@@ -4,6 +4,8 @@ use lettre::{
     Message, SmtpTransport, Transport,
 };
 
+use crate::paths;
+
 #[derive(Debug, thiserror::Error)]
 pub enum EmailError {
     #[error("Email build error: {0}")]
@@ -76,7 +78,7 @@ pub async fn send_magic_link(
     to_email: &str,
     token: &str,
 ) -> Result<(), EmailError> {
-    let magic_link = format!("{}/actions/auth/verify?token={}", config.base_url, token);
+    let magic_link = format!("{}{}?token={}", config.base_url, paths::actions::VERIFY_MAGIC_LINK, token);
 
     let from_mailbox: Mailbox = format!("{} <{}>", config.from_name, config.from_address).parse()?;
     let to_mailbox: Mailbox = to_email.parse()?;

@@ -31,7 +31,7 @@ pub fn todos(
                         li class="flex items-center gap-3 p-3 bg-white border rounded-lg" id={"todo-" (todo.todo_id)} {
                             form
                                 method="POST"
-                                action={(paths::forms::TODOS_TODO_ID_TOGGLE.replace("{todo_id}", &todo.todo_id.to_string()))}
+                                action={(paths::with_param(paths::forms::TODOS_TODO_ID_TOGGLE, "todo_id", &todo.todo_id))}
                                 class="flex-shrink-0"
                             {
                                 input
@@ -49,7 +49,7 @@ pub fn todos(
                             }
 
                             form
-                                hx-delete={(paths::actions::TODOS_TODO_ID.replace("{todo_id}", &todo.todo_id.to_string()))}
+                                hx-delete={(paths::with_param(paths::actions::TODOS_TODO_ID, "todo_id", &todo.todo_id))}
                                 hx-confirm="Are you sure you want to delete this todo?"
                                 hx-target={"#todo-" (todo.todo_id)}
                                 hx-swap="outerHTML"

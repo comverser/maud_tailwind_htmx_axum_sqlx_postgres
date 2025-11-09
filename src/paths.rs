@@ -71,3 +71,14 @@ pub mod static_files {
         FAVICON => "/img/favicon.svg",
     });
 }
+
+/// Helper function to replace path parameters with actual values.
+///
+/// # Example
+/// ```
+/// let path = with_param(paths::actions::TODOS_TODO_ID, "todo_id", &123);
+/// // Returns: "/actions/todos/123"
+/// ```
+pub fn with_param(path: &str, param_name: &str, value: &impl ToString) -> String {
+    path.replace(&format!("{{{}}}", param_name), &value.to_string())
+}

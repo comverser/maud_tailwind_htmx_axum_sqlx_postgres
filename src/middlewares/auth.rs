@@ -20,13 +20,12 @@ pub async fn require_authentication(req: Request, next: Next) -> axum::response:
         }
         _ => {
             let session = req.extensions().get::<Session>().cloned();
-            if let Some(session) = session {
-                if let Err(e) = FlashMessage::error("Please sign in to continue")
+            if let Some(session) = session
+                && let Err(e) = FlashMessage::error("Please sign in to continue")
                     .set(&session)
                     .await
-                {
-                    tracing::warn!("Failed to set flash message in auth middleware: {}", e);
-                }
+            {
+                tracing::warn!("Failed to set flash message in auth middleware: {}", e);
             }
             Redirect::to(paths::pages::SIGN_IN).into_response()
         }
