@@ -1,10 +1,10 @@
-use axum::{Extension, extract::{Path, State}, http::StatusCode, response::{IntoResponse, Response}};
+use axum::{Extension, extract::{Path, State}, response::Response};
 use sqlx::PgPool;
 
 use crate::{
     auth::CurrentUser,
     data::{commands, queries},
-    handlers::errors::HandlerError,
+    handlers::{errors::HandlerError, htmx},
     views::pages::todos,
 };
 
@@ -17,8 +17,8 @@ pub async fn delete_actions_todos_todo_id(
 
     commands::todo::delete_todo(&db, user_id, todo_id).await?;
 
-    // Return empty 200 response for HTMX to handle client-side removal
-    Ok(StatusCode::OK.into_response())
+    // Return empty 200 response for HTMX to remove element from DOM
+    Ok(htmx::empty_ok())
 }
 
 pub async fn patch_actions_todos_todo_id_toggle(
@@ -30,7 +30,7 @@ pub async fn patch_actions_todos_todo_id_toggle(
 
     commands::todo::toggle_todo(&db, user_id, todo_id).await?;
 
-    // Fetch the updated todo and return the HTML
+    // Fetch the updated todo and return the HTML for HTMX swap
     let todo = queries::todo::get_todo_by_id(&db, user_id, todo_id).await?;
-    Ok(todos::todo_item(&todo).into_response())
+    Ok(htmx::swap_html(todos::todo_item(&todo)))
 }

@@ -1,4 +1,4 @@
-use crate::{data::errors::DataError, handlers::dtos::todo::Todo};
+use crate::{data::errors::DataError, models::todo::Todo};
 use sqlx::PgPool;
 
 pub async fn get_todos_for_user(db: &PgPool, user_id: i32) -> Result<Vec<Todo>, DataError> {

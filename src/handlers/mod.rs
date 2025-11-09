@@ -8,8 +8,8 @@
 //! All handlers return `Result<T, HandlerError>` for consistent error handling.
 
 pub mod actions;
-pub mod dtos;
 pub mod errors;
 pub mod fallback;
 pub mod forms;
+pub mod htmx;
 pub mod pages;

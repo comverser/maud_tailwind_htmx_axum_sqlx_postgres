@@ -1,6 +1,6 @@
 use axum::{
     extract::{Query, State},
-    response::{IntoResponse, Redirect},
+    response::{IntoResponse, Redirect, Response},
 };
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -10,6 +10,7 @@ use crate::{
     auth::SESSION_USER_ID_KEY,
     data::commands,
     flash::FlashMessage,
+    handlers::errors::HandlerError,
     paths,
 };
 
@@ -23,7 +24,7 @@ pub async fn get_actions_auth_verify(
     State(db): State<PgPool>,
     session: Session,
     Query(query): Query<VerifyQuery>,
-) -> Result<impl IntoResponse, crate::handlers::errors::HandlerError> {
+) -> Result<Response, HandlerError> {
     // Verify and consume the magic link token
     let email = match commands::magic_link::verify_and_consume_magic_link(&db, &query.token).await
     {
@@ -32,7 +33,7 @@ pub async fn get_actions_auth_verify(
             FlashMessage::error("Invalid or expired magic link. Please request a new one.")
                 .set(&session)
                 .await?;
-            return Ok(Redirect::to(paths::pages::SIGN_IN));
+            return Ok(Redirect::to(paths::pages::SIGN_IN).into_response());
         }
     };
 
@@ -45,5 +46,5 @@ pub async fn get_actions_auth_verify(
         .set(&session)
         .await?;
 
-    Ok(Redirect::to(paths::pages::ROOT))
+    Ok(Redirect::to(paths::pages::ROOT).into_response())
 }

@@ -7,8 +7,8 @@ use crate::{
     auth::CurrentUser,
     data::{commands, queries},
     flash::FlashMessage,
-    handlers::dtos::todo::{CreateTodoForm, FIELD_TASK},
     handlers::errors::HandlerError,
+    models::todo::{CreateTodoForm, FIELD_TASK},
     paths::pages,
     views::pages::todos,
 };

@@ -16,6 +16,7 @@ mod handlers;
 mod init;
 mod magic_link;
 mod middlewares;
+mod models;
 mod paths;
 mod routes;
 mod views;

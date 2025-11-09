@@ -7,8 +7,8 @@ use crate::{
     data::commands,
     email::{self, EmailConfig},
     flash::FlashMessage,
-    handlers::dtos::user::{FIELD_EMAIL, MagicLinkRequestForm},
     magic_link,
+    models::user::{FIELD_EMAIL, MagicLinkRequestForm},
     paths,
     views::pages::sign_in,
 };

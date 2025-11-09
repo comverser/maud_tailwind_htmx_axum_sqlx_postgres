@@ -44,6 +44,27 @@ impl FlashMessage {
         session.insert(FLASH_MESSAGE_KEY, self).await
     }
 
+    /// Set flash message and return a redirect response.
+    ///
+    /// This is a convenience method for the common pattern of setting a flash
+    /// message and then redirecting to another page.
+    ///
+    /// # Example
+    /// ```
+    /// FlashMessage::success("Todo created successfully")
+    ///     .set_and_redirect(&session, paths::pages::TODOS)
+    ///     .await?
+    /// ```
+    pub async fn set_and_redirect(
+        self,
+        session: &tower_sessions::Session,
+        path: &str,
+    ) -> Result<axum::response::Response, tower_sessions::session::Error> {
+        use axum::response::{IntoResponse, Redirect};
+        self.set(session).await?;
+        Ok(Redirect::to(path).into_response())
+    }
+
     pub async fn get(
         session: &tower_sessions::Session,
     ) -> Result<Option<Self>, tower_sessions::session::Error> {

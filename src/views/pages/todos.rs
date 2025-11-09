@@ -1,7 +1,7 @@
 use crate::{
     auth::CurrentUser,
     flash::FlashMessage,
-    handlers::dtos::todo::{FIELD_TASK, Todo},
+    models::todo::{FIELD_TASK, Todo},
     paths,
     views::{components::form, layout::base::base_layout},
 };
