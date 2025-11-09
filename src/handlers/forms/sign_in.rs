@@ -34,7 +34,16 @@ pub async fn post_forms_sign_in(
     commands::magic_link::create_magic_link(&db, &form.email, &token).await?;
 
     // Send the magic link email
-    let email_config = EmailConfig::from_env();
+    let email_config = match EmailConfig::from_env() {
+        Ok(config) => config,
+        Err(e) => {
+            tracing::error!("Email configuration error: {}", e);
+            return Ok(FlashMessage::error("Email service is not configured. Please contact support.")
+                .set_and_redirect(&session, paths::pages::SIGN_IN)
+                .await?);
+        }
+    };
+
     if let Err(e) = email::send_magic_link(&email_config, &form.email, &token).await {
         tracing::error!("Failed to send magic link email: {}", e);
         return Ok(FlashMessage::error("Failed to send email. Please try again.")

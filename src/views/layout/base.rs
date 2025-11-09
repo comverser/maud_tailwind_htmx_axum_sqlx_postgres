@@ -1,15 +1,16 @@
 use super::navigation;
-use crate::{auth::CurrentUser, flash::FlashMessage, paths, views::components};
+use crate::{auth::CurrentUser, config, flash::FlashMessage, paths, views::components};
 use maud::{html, Markup, DOCTYPE};
 
 pub fn base_layout(current_user: &CurrentUser, flash: &Option<FlashMessage>, title: &str, meta_description: &str, content: Markup) -> Markup {
+    let site_name = config::site_name();
     html! {
         (DOCTYPE)
         html lang="en" {
             head {
                 meta charset="UTF-8";
                 meta name="viewport" content="width=device-width, initial-scale=1.0";
-                title { (title) " - MyTodoSite" }
+                title { (title) " - " (site_name) }
                 meta name="description" content=(meta_description);
 
                 // Favicon

@@ -1,5 +1,29 @@
 use axum::extract::FromRef;
 use sqlx::PgPool;
+use std::env::VarError;
+
+/// Site name used in page titles and branding.
+/// Can be customized via SITE_NAME environment variable.
+pub fn site_name() -> String {
+    dotenvy::var("SITE_NAME").unwrap_or_else(|_| "My App".to_string())
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ConfigError {
+    #[error("Missing required environment variable: {0}")]
+    MissingVar(String),
+    #[error("Invalid value for {0}: {1}")]
+    InvalidValue(String, String),
+}
+
+impl From<VarError> for ConfigError {
+    fn from(e: VarError) -> Self {
+        match e {
+            VarError::NotPresent => ConfigError::MissingVar("unknown".to_string()),
+            VarError::NotUnicode(_) => ConfigError::InvalidValue("unknown".to_string(), "not valid unicode".to_string()),
+        }
+    }
+}
 
 pub struct AppConfig {
     server_addr: String,
@@ -7,19 +31,17 @@ pub struct AppConfig {
 }
 
 impl AppConfig {
-    pub fn from_env() -> Self {
-        dotenvy::dotenv().ok();
-
+    pub fn from_env() -> Result<Self, ConfigError> {
         let database_url = dotenvy::var("DATABASE_URL")
-            .expect("DATABASE_URL must be set");
+            .map_err(|_| ConfigError::MissingVar("DATABASE_URL".to_string()))?;
 
         let server_addr = dotenvy::var("SERVER_ADDR")
             .unwrap_or_else(|_| "127.0.0.1:8000".to_string());
 
-        Self {
+        Ok(Self {
             server_addr,
             database_url,
-        }
+        })
     }
 
     pub fn server_addr(&self) -> &str {

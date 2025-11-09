@@ -4,7 +4,7 @@ use lettre::{
     Message, SmtpTransport, Transport,
 };
 
-use crate::paths;
+use crate::{email_templates, paths};
 
 #[derive(Debug, thiserror::Error)]
 pub enum EmailError {
@@ -14,6 +14,8 @@ pub enum EmailError {
     Transport(#[from] lettre::transport::smtp::Error),
     #[error("Invalid email address: {0}")]
     InvalidAddress(#[from] lettre::address::AddressError),
+    #[error("Configuration error: {0}")]
+    Config(String),
 }
 
 pub struct EmailConfig {
@@ -34,18 +36,19 @@ pub enum EmailMode {
 }
 
 impl EmailConfig {
-    pub fn from_env() -> Self {
-        dotenvy::dotenv().ok();
-
+    pub fn from_env() -> Result<Self, EmailError> {
         let mode = match dotenvy::var("EMAIL_MODE").as_deref() {
             Ok("smtp") => {
-                let host = dotenvy::var("SMTP_HOST").expect("SMTP_HOST must be set");
+                let host = dotenvy::var("SMTP_HOST")
+                    .map_err(|_| EmailError::Config("SMTP_HOST must be set when EMAIL_MODE=smtp".to_string()))?;
                 let port = dotenvy::var("SMTP_PORT")
-                    .expect("SMTP_PORT must be set")
+                    .map_err(|_| EmailError::Config("SMTP_PORT must be set when EMAIL_MODE=smtp".to_string()))?
                     .parse()
-                    .expect("SMTP_PORT must be a valid number");
-                let username = dotenvy::var("SMTP_USERNAME").expect("SMTP_USERNAME must be set");
-                let password = dotenvy::var("SMTP_PASSWORD").expect("SMTP_PASSWORD must be set");
+                    .map_err(|_| EmailError::Config("SMTP_PORT must be a valid number".to_string()))?;
+                let username = dotenvy::var("SMTP_USERNAME")
+                    .map_err(|_| EmailError::Config("SMTP_USERNAME must be set when EMAIL_MODE=smtp".to_string()))?;
+                let password = dotenvy::var("SMTP_PASSWORD")
+                    .map_err(|_| EmailError::Config("SMTP_PASSWORD must be set when EMAIL_MODE=smtp".to_string()))?;
 
                 EmailMode::Smtp {
                     host,
@@ -64,12 +67,12 @@ impl EmailConfig {
         let base_url =
             dotenvy::var("BASE_URL").unwrap_or_else(|_| "http://127.0.0.1:8000".to_string());
 
-        Self {
+        Ok(Self {
             mode,
             from_address,
             from_name,
             base_url,
-        }
+        })
     }
 }
 
@@ -88,29 +91,7 @@ pub async fn send_magic_link(
         .to(to_mailbox)
         .subject("Sign in to your account")
         .header(ContentType::TEXT_HTML)
-        .body(format!(
-            r#"
-            <html>
-                <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <h2>Sign in to your account</h2>
-                    <p>Click the link below to sign in. This link will expire in 15 minutes.</p>
-                    <p style="margin: 30px 0;">
-                        <a href="{}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-                            Sign In
-                        </a>
-                    </p>
-                    <p style="color: #666; font-size: 14px;">
-                        Or copy and paste this link into your browser:<br>
-                        <a href="{}">{}</a>
-                    </p>
-                    <p style="color: #999; font-size: 12px; margin-top: 40px;">
-                        If you didn't request this email, you can safely ignore it.
-                    </p>
-                </body>
-            </html>
-            "#,
-            magic_link, magic_link, magic_link
-        ))?;
+        .body(email_templates::magic_link_signin(&magic_link))?;
 
     match &config.mode {
         EmailMode::Console => {

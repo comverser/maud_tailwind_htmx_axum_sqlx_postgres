@@ -11,6 +11,7 @@ mod auth;
 mod config;
 mod data;
 mod email;
+mod email_templates;
 mod flash;
 mod handlers;
 mod init;
@@ -27,7 +28,17 @@ use config::{AppConfig, AppState};
 async fn main() {
     init::init_logging();
 
-    let config = AppConfig::from_env();
+    // Load environment variables once at startup
+    dotenvy::dotenv().ok();
+
+    let config = AppConfig::from_env().unwrap_or_else(|e| {
+        eprintln!("Configuration error: {}", e);
+        eprintln!("\nPlease check your .env file and ensure all required variables are set.");
+        eprintln!("Required: DATABASE_URL");
+        eprintln!("Optional: SERVER_ADDR (defaults to 127.0.0.1:8000)");
+        std::process::exit(1);
+    });
+
     let db = init::init_database(config.database_url()).await;
     let session_layer = init::init_session(db.clone()).await;
     let state = AppState::new(db);
@@ -35,10 +46,13 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(config.server_addr())
         .await
         .unwrap_or_else(|e| {
-            panic!(
+            eprintln!(
                 "Failed to bind to address {}: {}",
-                config.server_addr(), e
-            )
+                config.server_addr(),
+                e
+            );
+            eprintln!("\nIs another process already using this port?");
+            std::process::exit(1);
         });
 
     tracing::info!("Server listening on {}", config.server_addr());

@@ -1,4 +1,7 @@
-use crate::data::{ensure_rows_affected, errors::DataError};
+use crate::{
+    data::{ensure_rows_affected, errors::DataError},
+    models::todo::Todo,
+};
 use sqlx::PgPool;
 
 pub async fn create_todo(db: &PgPool, user_id: i32, task: &str) -> Result<(), DataError> {
@@ -14,17 +17,27 @@ pub async fn create_todo(db: &PgPool, user_id: i32, task: &str) -> Result<(), Da
     Ok(())
 }
 
-pub async fn toggle_todo(db: &PgPool, user_id: i32, todo_id: i32) -> Result<(), DataError> {
-    let result = sqlx::query!(
-        "UPDATE todos SET is_done = NOT is_done WHERE todo_id = $1 AND author_id = $2",
+/// Toggles todo completion status and returns the updated todo.
+///
+/// Uses a single database roundtrip with UPDATE...RETURNING for efficiency.
+pub async fn toggle_todo_returning(
+    db: &PgPool,
+    user_id: i32,
+    todo_id: i32,
+) -> Result<Todo, DataError> {
+    let todo = sqlx::query_as!(
+        Todo,
+        "UPDATE todos SET is_done = NOT is_done
+         WHERE todo_id = $1 AND author_id = $2
+         RETURNING todo_id, task, is_done",
         todo_id,
         user_id
     )
-    .execute(db)
+    .fetch_one(db)
     .await
-    .map_err(DataError::Database)?;
+    .map_err(|e| crate::data::map_row_not_found(e, "Todo not found"))?;
 
-    ensure_rows_affected(result, "Todo not found")
+    Ok(todo)
 }
 
 pub async fn delete_todo(db: &PgPool, user_id: i32, todo_id: i32) -> Result<(), DataError> {
