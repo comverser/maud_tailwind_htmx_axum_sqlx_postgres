@@ -28,41 +28,7 @@ pub fn todos(
             } @else {
                 ul class="space-y-2" {
                     @for todo in todos {
-                        li class="flex items-center gap-3 p-3 bg-white border rounded-lg" id={"todo-" (todo.todo_id)} {
-                            form
-                                hx-patch={(paths::with_param(paths::actions::TODOS_TODO_ID_TOGGLE, "todo_id", &todo.todo_id))}
-                                hx-swap="none"
-                                class="flex-shrink-0"
-                            {
-                                input
-                                    type="checkbox"
-                                    checked[todo.is_done]
-                                    onchange="this.form.requestSubmit()"
-                                    class="w-5 h-5 cursor-pointer";
-                            }
-
-                            span class={
-                                "flex-1 "
-                                @if todo.is_done { "line-through text-gray-500" }
-                            } {
-                                (todo.task)
-                            }
-
-                            form
-                                hx-delete={(paths::with_param(paths::actions::TODOS_TODO_ID, "todo_id", &todo.todo_id))}
-                                hx-confirm="Are you sure you want to delete this todo?"
-                                hx-target={"#todo-" (todo.todo_id)}
-                                hx-swap="outerHTML"
-                                class="flex-shrink-0"
-                            {
-                                button
-                                    type="submit"
-                                    class="text-red-600 hover:text-red-800 px-2 py-1"
-                                {
-                                    "Delete"
-                                }
-                            }
-                        }
+                        (todo_item(&todo))
                     }
                 }
             }
@@ -70,4 +36,45 @@ pub fn todos(
     };
 
     base_layout(current_user, flash, "Todos", "Manage your todos", content)
+}
+
+pub fn todo_item(todo: &Todo) -> Markup {
+    html! {
+        li class="flex items-center gap-3 p-3 bg-white border rounded-lg" id={"todo-" (todo.todo_id)} {
+            form
+                hx-patch={(paths::with_param(paths::actions::TODOS_TODO_ID_TOGGLE, "todo_id", &todo.todo_id))}
+                hx-target={"#todo-" (todo.todo_id)}
+                hx-swap="outerHTML"
+                class="flex-shrink-0"
+            {
+                input
+                    type="checkbox"
+                    checked[todo.is_done]
+                    onchange="this.form.requestSubmit()"
+                    class="w-5 h-5 cursor-pointer";
+            }
+
+            span class={
+                "flex-1 "
+                @if todo.is_done { "line-through text-gray-500" }
+            } {
+                (todo.task)
+            }
+
+            form
+                hx-delete={(paths::with_param(paths::actions::TODOS_TODO_ID, "todo_id", &todo.todo_id))}
+                hx-confirm="Are you sure you want to delete this todo?"
+                hx-target={"#todo-" (todo.todo_id)}
+                hx-swap="outerHTML"
+                class="flex-shrink-0"
+            {
+                button
+                    type="submit"
+                    class="text-red-600 hover:text-red-800 px-2 py-1"
+                {
+                    "Delete"
+                }
+            }
+        }
+    }
 }

@@ -1,11 +1,11 @@
-use axum::{Extension, extract::{Path, State}, http::StatusCode, response::{IntoResponse, Redirect, Response}};
+use axum::{Extension, extract::{Path, State}, http::StatusCode, response::{IntoResponse, Response}};
 use sqlx::PgPool;
 
 use crate::{
     auth::CurrentUser,
-    data::commands,
+    data::{commands, queries},
     handlers::errors::HandlerError,
-    paths,
+    views::pages::todos,
 };
 
 pub async fn delete_actions_todos_todo_id(
@@ -29,5 +29,8 @@ pub async fn patch_actions_todos_todo_id_toggle(
     let user_id = current_user.require_authenticated();
 
     commands::todo::toggle_todo(&db, user_id, todo_id).await?;
-    Ok(Redirect::to(paths::pages::TODOS).into_response())
+
+    // Fetch the updated todo and return the HTML
+    let todo = queries::todo::get_todo_by_id(&db, user_id, todo_id).await?;
+    Ok(todos::todo_item(&todo).into_response())
 }
