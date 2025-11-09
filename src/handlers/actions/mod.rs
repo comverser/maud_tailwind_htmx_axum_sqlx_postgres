@@ -5,3 +5,4 @@ mod todo;
 pub use auth::get_actions_auth_verify;
 pub use sign_out::post_actions_sign_out;
 pub use todo::delete_actions_todos_todo_id;
+pub use todo::patch_actions_todos_todo_id_toggle;

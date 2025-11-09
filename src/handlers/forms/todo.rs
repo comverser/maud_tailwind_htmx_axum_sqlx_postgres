@@ -1,4 +1,4 @@
-use axum::{Extension, Form, extract::{Path, State}, http::StatusCode, response::{IntoResponse, Redirect, Response}};
+use axum::{Extension, Form, extract::State, http::StatusCode, response::{IntoResponse, Redirect, Response}};
 use sqlx::PgPool;
 use tower_sessions::Session;
 use validator::Validate;
@@ -29,17 +29,6 @@ pub async fn post_forms_todos(
 
     commands::todo::create_todo(&db, user_id, form.task.trim()).await?;
     FlashMessage::success("Todo created successfully").set(&session).await?;
-    Ok(Redirect::to(pages::TODOS).into_response())
-}
-
-pub async fn post_forms_todos_todo_id_toggle(
-    State(db): State<PgPool>,
-    Extension(current_user): Extension<CurrentUser>,
-    Path(todo_id): Path<i32>,
-) -> Result<Response, HandlerError> {
-    let user_id = current_user.require_authenticated();
-
-    commands::todo::toggle_todo(&db, user_id, todo_id).await?;
     Ok(Redirect::to(pages::TODOS).into_response())
 }
 

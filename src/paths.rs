@@ -54,7 +54,6 @@ pub mod forms {
     define_nested_routes!("/forms", {
         SIGN_IN => "/sign_in",
         TODOS => "/todos",
-        TODOS_TODO_ID_TOGGLE => "/todos/{todo_id}/toggle",
     });
 }
 
@@ -63,6 +62,7 @@ pub mod actions {
         SIGN_OUT => "/sign_out",
         VERIFY_MAGIC_LINK => "/auth/verify",
         TODOS_TODO_ID => "/todos/{todo_id}",
+        TODOS_TODO_ID_TOGGLE => "/todos/{todo_id}/toggle",
     });
 }
 

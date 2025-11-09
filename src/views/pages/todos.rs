@@ -30,14 +30,14 @@ pub fn todos(
                     @for todo in todos {
                         li class="flex items-center gap-3 p-3 bg-white border rounded-lg" id={"todo-" (todo.todo_id)} {
                             form
-                                method="POST"
-                                action={(paths::with_param(paths::forms::TODOS_TODO_ID_TOGGLE, "todo_id", &todo.todo_id))}
+                                hx-patch={(paths::with_param(paths::actions::TODOS_TODO_ID_TOGGLE, "todo_id", &todo.todo_id))}
+                                hx-swap="none"
                                 class="flex-shrink-0"
                             {
                                 input
                                     type="checkbox"
                                     checked[todo.is_done]
-                                    onchange="this.form.submit()"
+                                    onchange="this.form.requestSubmit()"
                                     class="w-5 h-5 cursor-pointer";
                             }
 
