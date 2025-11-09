@@ -10,10 +10,4 @@ pub enum DataError {
 
     #[error("{0}")]
     Unauthorized(&'static str),
-
-    #[error("{0}")]
-    Conflict(&'static str),
-
-    #[error("{0}")]
-    Internal(&'static str),
 }

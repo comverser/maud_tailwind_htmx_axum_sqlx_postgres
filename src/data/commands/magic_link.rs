@@ -57,15 +57,3 @@ pub async fn verify_and_consume_magic_link(
 
     Ok(row.email)
 }
-
-/// Clean up expired magic links (should be called periodically)
-pub async fn cleanup_expired_magic_links(db: &PgPool) -> Result<u64, DataError> {
-    let now = OffsetDateTime::now_utc();
-
-    let result = sqlx::query!("DELETE FROM magic_links WHERE expires_at <= $1", now)
-        .execute(db)
-        .await
-        .map_err(DataError::Database)?;
-
-    Ok(result.rows_affected())
-}

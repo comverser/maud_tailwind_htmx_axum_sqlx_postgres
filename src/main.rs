@@ -1,3 +1,12 @@
+//! Web application template using Axum, HTMX, Tailwind CSS, and PostgreSQL.
+//!
+//! This template provides a clean starting point for building web applications with:
+//! - Type-first routing organized by interaction type (pages, forms, actions)
+//! - RESTful API design within each route type
+//! - Magic link authentication
+//! - Session management with PostgreSQL storage
+//! - Compile-time HTML templates using Maud
+
 mod auth;
 mod config;
 mod data;
