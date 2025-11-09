@@ -5,7 +5,7 @@ const TOKEN_LENGTH: usize = 32;
 /// Generate a secure random token for magic link authentication
 pub fn generate_token() -> String {
     use rand::RngCore;
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut random_bytes = vec![0u8; TOKEN_LENGTH];
     rng.fill_bytes(&mut random_bytes);
     URL_SAFE_NO_PAD.encode(&random_bytes)
