@@ -40,6 +40,16 @@ Don't abstract until duplication appears.
 - Inline is fine for single use - don't premature optimize
 - Extract when you find duplication, not before
 
+### Write Durable Comments
+Write comments only when they are truly important and likely to remain accurate.
+
+- **Favor architectural comments over implementation details** - Document *why* and *how things work together*, not *what* the code does
+- **Avoid case-specific comments** - Comments tied to specific implementation details may become invalid as the template evolves
+- **Write timeless comments** - Focus on patterns, safety requirements, and architectural decisions that will remain relevant
+- **Good examples**: Middleware ordering requirements, safety assumptions, CQRS separation rationale
+- **Avoid**: Comments describing specific field names, current values, or temporary states
+- **When in doubt, skip it** - Code should be self-documenting through clear naming; only add comments for non-obvious decisions
+
 ### Other Principles
 - Follow modern Rust conventions
 - Minimize symbol visibility: prefer private unless public is required
