@@ -29,7 +29,6 @@ use config::{AppConfig, AppState};
 async fn main() {
     init::init_logging();
 
-    // Load environment variables once at startup
     dotenvy::dotenv().ok();
 
     let config = AppConfig::from_env().unwrap_or_else(|e| {

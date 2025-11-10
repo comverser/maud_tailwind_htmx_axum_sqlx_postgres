@@ -18,7 +18,6 @@ mod tests {
     #[test]
     fn test_generate_token_length() {
         let token = generate_token();
-        // Base64 encoded 32 bytes should be ~43 characters
         assert!(token.len() > 40);
     }
 

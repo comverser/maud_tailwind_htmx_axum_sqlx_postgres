@@ -17,9 +17,6 @@ pub async fn create_todo(db: &PgPool, user_id: i32, task: &str) -> Result<(), Da
     Ok(())
 }
 
-/// Toggles todo completion status and returns the updated todo.
-///
-/// Uses a single database roundtrip with UPDATE...RETURNING for efficiency.
 pub async fn toggle_todo_returning(
     db: &PgPool,
     user_id: i32,
