@@ -17,4 +17,5 @@ pub async fn init_session(db: PgPool) -> SessionManagerLayer<PostgresStore> {
 
     SessionManagerLayer::new(session_store)
         .with_expiry(tower_sessions::Expiry::OnInactivity(time::Duration::days(1)))
+        .with_same_site(tower_sessions::cookie::SameSite::Lax)
 }

@@ -114,7 +114,7 @@ pub async fn send_magic_link(
             password,
         } => {
             let creds = Credentials::new(username.to_string(), password.to_string());
-            let mailer = SmtpTransport::relay(host)?
+            let mailer = SmtpTransport::starttls_relay(host)?
                 .port(*port)
                 .credentials(creds)
                 .build();
