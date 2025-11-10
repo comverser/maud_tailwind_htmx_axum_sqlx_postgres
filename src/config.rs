@@ -3,9 +3,8 @@ use sqlx::PgPool;
 use std::env::VarError;
 
 /// Site name used in page titles and branding.
-/// Can be customized via SITE_NAME environment variable.
 pub fn site_name() -> String {
-    dotenvy::var("SITE_NAME").unwrap_or_else(|_| "My App".to_string())
+    dotenvy::var("SITE_NAME").expect("SITE_NAME must be set")
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -36,7 +35,7 @@ impl AppConfig {
             .map_err(|_| ConfigError::MissingVar("DATABASE_URL".to_string()))?;
 
         let server_addr = dotenvy::var("SERVER_ADDR")
-            .unwrap_or_else(|_| "127.0.0.1:8000".to_string());
+            .map_err(|_| ConfigError::MissingVar("SERVER_ADDR".to_string()))?;
 
         Ok(Self {
             server_addr,

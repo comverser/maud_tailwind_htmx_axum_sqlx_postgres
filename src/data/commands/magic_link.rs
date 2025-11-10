@@ -1,8 +1,7 @@
+use crate::constants::auth::MAGIC_LINK_EXPIRY_MINUTES;
 use crate::data::errors::DataError;
 use sqlx::PgPool;
 use time::{Duration, OffsetDateTime};
-
-const MAGIC_LINK_EXPIRY_MINUTES: i64 = 15;
 
 /// Create or update a magic link token for an email address
 pub async fn create_magic_link(

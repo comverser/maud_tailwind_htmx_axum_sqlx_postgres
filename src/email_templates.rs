@@ -1,3 +1,5 @@
+use crate::constants::auth::MAGIC_LINK_EXPIRY_MINUTES;
+
 /// Email template functions for generating HTML email content.
 ///
 /// This module separates presentation (HTML templates) from business logic (sending).
@@ -15,7 +17,7 @@ pub fn magic_link_signin(magic_link: &str) -> String {
         <html>
             <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h2>Sign in to your account</h2>
-                <p>Click the link below to sign in. This link will expire in 15 minutes.</p>
+                <p>Click the link below to sign in. This link will expire in {} minutes.</p>
                 <p style="margin: 30px 0;">
                     <a href="{}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                         Sign In
@@ -31,6 +33,6 @@ pub fn magic_link_signin(magic_link: &str) -> String {
             </body>
         </html>
         "#,
-        magic_link, magic_link, magic_link
+        MAGIC_LINK_EXPIRY_MINUTES, magic_link, magic_link, magic_link
     )
 }

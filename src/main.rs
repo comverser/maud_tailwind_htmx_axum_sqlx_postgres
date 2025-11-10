@@ -9,6 +9,7 @@
 
 mod auth;
 mod config;
+mod constants;
 mod data;
 mod email;
 mod email_templates;
@@ -34,8 +35,7 @@ async fn main() {
     let config = AppConfig::from_env().unwrap_or_else(|e| {
         eprintln!("Configuration error: {}", e);
         eprintln!("\nPlease check your .env file and ensure all required variables are set.");
-        eprintln!("Required: DATABASE_URL");
-        eprintln!("Optional: SERVER_ADDR (defaults to 127.0.0.1:8000)");
+        eprintln!("Required: DATABASE_URL, SERVER_ADDR");
         std::process::exit(1);
     });
 

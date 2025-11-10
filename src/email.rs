@@ -61,11 +61,11 @@ impl EmailConfig {
         };
 
         let from_address = dotenvy::var("EMAIL_FROM_ADDRESS")
-            .unwrap_or_else(|_| "noreply@example.com".to_string());
-        let from_name =
-            dotenvy::var("EMAIL_FROM_NAME").unwrap_or_else(|_| "Magic Link Auth".to_string());
-        let base_url =
-            dotenvy::var("BASE_URL").unwrap_or_else(|_| "http://127.0.0.1:8000".to_string());
+            .expect("EMAIL_FROM_ADDRESS must be set");
+        let from_name = dotenvy::var("EMAIL_FROM_NAME")
+            .expect("EMAIL_FROM_NAME must be set");
+        let base_url = dotenvy::var("BASE_URL")
+            .expect("BASE_URL must be set");
 
         Ok(Self {
             mode,
