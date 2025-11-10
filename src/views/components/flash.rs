@@ -2,7 +2,7 @@ use maud::{html, Markup};
 
 use crate::flash::{FlashKind, FlashMessage};
 
-pub fn flash(message: &Option<FlashMessage>) -> Markup {
+pub fn flash(message: Option<&FlashMessage>) -> Markup {
     match message {
         Some(flash) => {
             let (bg_color, border_color, text_color) = match flash.kind {

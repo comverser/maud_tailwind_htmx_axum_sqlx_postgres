@@ -8,6 +8,7 @@ use tower_sessions::Session;
 
 use crate::{
     auth::SESSION_USER_ID_KEY,
+    constants::messages,
     data::commands,
     flash::FlashMessage,
     handlers::errors::HandlerError,
@@ -30,7 +31,7 @@ pub async fn get_actions_auth_verify(
     {
         Ok(email) => email,
         Err(_) => {
-            return Ok(FlashMessage::error("Invalid or expired magic link. Please request a new one.")
+            return Ok(FlashMessage::error(messages::MAGIC_LINK_INVALID)
                 .set_and_redirect(&session, paths::pages::SIGN_IN)
                 .await?);
         }
@@ -42,7 +43,7 @@ pub async fn get_actions_auth_verify(
     // Create session
     session.insert(SESSION_USER_ID_KEY, user_id).await?;
 
-    Ok(FlashMessage::success("Successfully signed in!")
+    Ok(FlashMessage::success(messages::SIGNED_IN)
         .set_and_redirect(&session, paths::pages::ROOT)
         .await?)
 }

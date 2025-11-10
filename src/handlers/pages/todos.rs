@@ -12,5 +12,5 @@ pub async fn get_todos(
 
     let todos = queries::todo::get_todos_for_user(&db, user_id).await?;
 
-    Ok(pages::todos::todos(&current_user, &flash, todos, None, None))
+    Ok(pages::todos::todos(&current_user, flash.as_ref(), todos, None, None))
 }

@@ -9,7 +9,7 @@ use maud::{html, Markup};
 
 pub fn todos(
     current_user: &CurrentUser,
-    flash: &Option<FlashMessage>,
+    flash: Option<&FlashMessage>,
     todos: Vec<Todo>,
     task_value: Option<&str>,
     task_error: Option<&str>,

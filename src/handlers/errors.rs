@@ -30,6 +30,6 @@ impl IntoResponse for HandlerError {
             }
         };
 
-        (status, server_error::server_error(&CurrentUser::Guest, &None, message)).into_response()
+        (status, server_error::server_error(&CurrentUser::Guest, None, message)).into_response()
     }
 }

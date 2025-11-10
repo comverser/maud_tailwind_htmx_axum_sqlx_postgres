@@ -51,3 +51,22 @@ pub fn map_row_not_found(error: sqlx::Error, message: &'static str) -> DataError
         _ => DataError::Database(error),
     }
 }
+
+/// Helper to map sqlx::Error::RowNotFound to DataError::Unauthorized.
+///
+/// Use this for authentication/authorization failures where a missing row
+/// indicates unauthorized access rather than a simple "not found" case.
+///
+/// # Example
+/// ```
+/// let email = sqlx::query!("DELETE FROM magic_links WHERE token = $1 RETURNING email", token)
+///     .fetch_one(db)
+///     .await
+///     .map_err(|e| map_row_unauthorized(e, "Invalid or expired magic link"))?;
+/// ```
+pub fn map_row_unauthorized(error: sqlx::Error, message: &'static str) -> DataError {
+    match error {
+        sqlx::Error::RowNotFound => DataError::Unauthorized(message),
+        _ => DataError::Database(error),
+    }
+}

@@ -4,6 +4,7 @@ use validator::Validate;
 
 use crate::{
     auth::CurrentUser,
+    constants::messages,
     data::commands,
     email::{self, EmailConfig},
     flash::FlashMessage,
@@ -38,7 +39,7 @@ pub async fn post_forms_sign_in(
         Ok(config) => config,
         Err(e) => {
             tracing::error!("Email configuration error: {}", e);
-            return Ok(FlashMessage::error("Email service is not configured. Please contact support.")
+            return Ok(FlashMessage::error(messages::EMAIL_NOT_CONFIGURED)
                 .set_and_redirect(&session, paths::pages::SIGN_IN)
                 .await?);
         }
@@ -46,13 +47,13 @@ pub async fn post_forms_sign_in(
 
     if let Err(e) = email::send_magic_link(&email_config, &form.email, &token).await {
         tracing::error!("Failed to send magic link email: {}", e);
-        return Ok(FlashMessage::error("Failed to send email. Please try again.")
+        return Ok(FlashMessage::error(messages::EMAIL_SEND_FAILED)
             .set_and_redirect(&session, paths::pages::SIGN_IN)
             .await?);
     }
 
     // Show success message
-    Ok(FlashMessage::success("Check your email! We sent you a link to sign in.")
+    Ok(FlashMessage::success(messages::MAGIC_LINK_SENT)
         .set_and_redirect(&session, paths::pages::SIGN_IN)
         .await?)
 }
@@ -67,7 +68,7 @@ fn render_validation_errors(
         StatusCode::BAD_REQUEST,
         sign_in::sign_in(
             current_user,
-            &None,
+            None,
             Some(&form.email),
             errors.get(FIELD_EMAIL).map(String::as_str),
         ),

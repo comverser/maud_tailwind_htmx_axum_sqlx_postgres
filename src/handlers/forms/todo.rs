@@ -5,6 +5,7 @@ use validator::Validate;
 
 use crate::{
     auth::CurrentUser,
+    constants::messages,
     data::{commands, queries},
     flash::FlashMessage,
     handlers::errors::HandlerError,
@@ -28,7 +29,7 @@ pub async fn post_forms_todos(
     }
 
     commands::todo::create_todo(&db, user_id, form.task.trim()).await?;
-    Ok(FlashMessage::success("Todo created successfully")
+    Ok(FlashMessage::success(messages::TODO_CREATED)
         .set_and_redirect(&session, pages::TODOS)
         .await?)
 }
@@ -47,7 +48,7 @@ async fn render_validation_errors(
         StatusCode::BAD_REQUEST,
         todos::todos(
             current_user,
-            &None,
+            None,
             todos_list,
             Some(&form.task),
             errors.get(FIELD_TASK).map(String::as_str),

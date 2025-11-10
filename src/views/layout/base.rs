@@ -2,7 +2,7 @@ use super::navigation;
 use crate::{auth::CurrentUser, config, flash::FlashMessage, paths, views::components};
 use maud::{html, Markup, DOCTYPE};
 
-pub fn base_layout(current_user: &CurrentUser, flash: &Option<FlashMessage>, title: &str, meta_description: &str, content: Markup) -> Markup {
+pub fn base_layout(current_user: &CurrentUser, flash: Option<&FlashMessage>, title: &str, meta_description: &str, content: Markup) -> Markup {
     let site_name = config::site_name();
     html! {
         (DOCTYPE)

@@ -1,5 +1,5 @@
 use crate::constants::auth::MAGIC_LINK_EXPIRY_MINUTES;
-use crate::data::errors::DataError;
+use crate::data::{errors::DataError, map_row_unauthorized};
 use sqlx::PgPool;
 use time::{Duration, OffsetDateTime};
 
@@ -49,10 +49,7 @@ pub async fn verify_and_consume_magic_link(
     )
     .fetch_one(db)
     .await
-    .map_err(|e| match e {
-        sqlx::Error::RowNotFound => DataError::Unauthorized("Invalid or expired magic link"),
-        _ => DataError::Database(e),
-    })?;
+    .map_err(|e| map_row_unauthorized(e, "Invalid or expired magic link"))?;
 
     Ok(row.email)
 }

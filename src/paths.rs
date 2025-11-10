@@ -31,11 +31,15 @@ macro_rules! define_nested_routes {
     ($base:expr, { $($name:ident => $path:expr),* $(,)? }) => {
         pub const BASE: &str = $base;
 
+        // Allow unused relative paths - these provide flexibility for future use
+        // and path composition without requiring all paths to be used
         #[allow(dead_code)]
         pub mod relative {
             $(pub const $name: &str = $path;)*
         }
 
+        // Allow unused absolute paths - not all defined routes may be used yet
+        // as this is a template where routes are added as needed
         $(
             #[allow(dead_code)]
             pub const $name: &str = concat!($base, $path);

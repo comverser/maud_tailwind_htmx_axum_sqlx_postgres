@@ -9,7 +9,7 @@ use maud::{html, Markup};
 
 pub fn sign_in(
     current_user: &CurrentUser,
-    flash: &Option<FlashMessage>,
+    flash: Option<&FlashMessage>,
     email_value: Option<&str>,
     email_error: Option<&str>,
 ) -> Markup {
