@@ -1,10 +1,7 @@
 //! Database access layer following CQRS pattern.
 //!
-//! Separates data operations into:
-//! - `commands`: Database mutations (INSERT, UPDATE, DELETE)
-//! - `queries`: Database reads (SELECT)
-//!
-//! All operations return `Result<T, DataError>` for error handling.
+//! Separates data operations into commands (mutations) and queries (reads)
+//! for clearer intent and better organization.
 
 pub mod commands;
 pub mod errors;
@@ -13,18 +10,10 @@ pub mod queries;
 use errors::DataError;
 use sqlx::postgres::PgQueryResult;
 
-/// Helper to check if a query affected any rows, returning an error if not.
+/// Verifies that a database operation affected rows.
 ///
-/// This is commonly used to verify that an UPDATE or DELETE operation
-/// actually found and modified a row, ensuring proper authorization.
-///
-/// # Example
-/// ```
-/// let result = sqlx::query!("DELETE FROM todos WHERE id = $1 AND user_id = $2", id, user_id)
-///     .execute(db)
-///     .await?;
-/// ensure_rows_affected(result, "Todo not found")?;
-/// ```
+/// Used to ensure mutations (UPDATE/DELETE) with WHERE clauses
+/// actually found matching rows, which validates authorization when user_id is in the clause.
 pub fn ensure_rows_affected(result: PgQueryResult, message: &'static str) -> Result<(), DataError> {
     if result.rows_affected() == 0 {
         Err(DataError::NotFound(message))
@@ -33,18 +22,7 @@ pub fn ensure_rows_affected(result: PgQueryResult, message: &'static str) -> Res
     }
 }
 
-/// Helper to map sqlx::Error::RowNotFound to DataError::NotFound.
-///
-/// This standardizes the common pattern of converting sqlx errors
-/// when fetching a single row that may not exist.
-///
-/// # Example
-/// ```
-/// let todo = sqlx::query_as!(Todo, "SELECT * FROM todos WHERE id = $1", id)
-///     .fetch_one(db)
-///     .await
-///     .map_err(|e| map_row_not_found(e, "Todo not found"))?;
-/// ```
+/// Maps sqlx::Error::RowNotFound to DataError::NotFound.
 pub fn map_row_not_found(error: sqlx::Error, message: &'static str) -> DataError {
     match error {
         sqlx::Error::RowNotFound => DataError::NotFound(message),
@@ -52,18 +30,9 @@ pub fn map_row_not_found(error: sqlx::Error, message: &'static str) -> DataError
     }
 }
 
-/// Helper to map sqlx::Error::RowNotFound to DataError::Unauthorized.
+/// Maps sqlx::Error::RowNotFound to DataError::Unauthorized.
 ///
-/// Use this for authentication/authorization failures where a missing row
-/// indicates unauthorized access rather than a simple "not found" case.
-///
-/// # Example
-/// ```
-/// let email = sqlx::query!("DELETE FROM magic_links WHERE token = $1 RETURNING email", token)
-///     .fetch_one(db)
-///     .await
-///     .map_err(|e| map_row_unauthorized(e, "Invalid or expired magic link"))?;
-/// ```
+/// Use when a missing row indicates authorization failure rather than simple not-found.
 pub fn map_row_unauthorized(error: sqlx::Error, message: &'static str) -> DataError {
     match error {
         sqlx::Error::RowNotFound => DataError::Unauthorized(message),

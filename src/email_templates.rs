@@ -1,16 +1,9 @@
-//! Email template functions for generating HTML email content.
+//! Email template functions.
 //!
-//! This module separates presentation (HTML templates) from business logic (sending).
+//! Separates presentation (HTML templates) from business logic (email sending).
 
 use crate::constants::auth::MAGIC_LINK_EXPIRY_MINUTES;
 
-/// Generates the HTML body for a magic link signin email.
-///
-/// # Arguments
-/// * `magic_link` - The full URL for the magic link
-///
-/// # Returns
-/// HTML string ready to be used as email body
 pub fn magic_link_signin(magic_link: &str) -> String {
     format!(
         r#"

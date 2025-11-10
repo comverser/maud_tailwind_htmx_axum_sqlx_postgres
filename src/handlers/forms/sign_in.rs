@@ -18,7 +18,6 @@ use tower_sessions::Session;
 
 use super::parse_validation_errors;
 
-/// Handle magic link request - sends an email with a sign-in link
 pub async fn post_forms_sign_in(
     State(config): State<AppConfig>,
     State(db): State<PgPool>,
@@ -30,13 +29,9 @@ pub async fn post_forms_sign_in(
         return Ok(render_validation_errors(&current_user, config.site_name(), &form, &validation_errors));
     }
 
-    // Generate magic link token
     let token = magic_link::generate_token();
-
-    // Store the magic link in database
     commands::magic_link::create_magic_link(&db, &form.email, &token).await?;
 
-    // Send the magic link email
     if let Err(e) = email::send_magic_link(config.email(), &form.email, &token).await {
         tracing::error!("Failed to send magic link email: {}", e);
         return Ok(FlashMessage::error(messages::EMAIL_SEND_FAILED)
@@ -44,7 +39,6 @@ pub async fn post_forms_sign_in(
             .await?);
     }
 
-    // Show success message
     Ok(FlashMessage::success(messages::MAGIC_LINK_SENT)
         .set_and_redirect(&session, paths::pages::SIGN_IN)
         .await?)

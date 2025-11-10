@@ -1,13 +1,7 @@
 //! Application routing configuration.
 //!
-//! Routes are organized by interaction type and protection level:
-//! - Public routes: accessible without authentication
-//! - Protected routes: require authentication via `require_authentication` middleware
-//!
-//! Route types:
-//! - Pages (`/`): GET-only routes for rendering views
-//! - Forms (`/forms/*`): POST routes for form submissions
-//! - Actions (`/actions/*`): POST/DELETE/PATCH routes for state changes
+//! Routes are organized by interaction type (pages, forms, actions) and protection level.
+//! Authentication enforcement is applied at the route group level via middleware.
 
 mod actions;
 mod forms;

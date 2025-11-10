@@ -1,4 +1,3 @@
-/// Session key for storing the authenticated user's ID
 pub const SESSION_USER_ID_KEY: &str = "authenticated_user_id";
 
 /// Represents the current user's authentication state.

@@ -1,9 +1,5 @@
-//! Maud HTML templates for rendering views.
-//!
-//! Organized into:
-//! - `layout`: Base HTML structure and reusable layout components
-//! - `components`: Small, reusable UI components (forms, flash messages, etc.)
-//! - `pages`: Full page templates that compose layout and components
+//! Maud HTML templates organized by composition level:
+//! layout (base structure), components (reusable elements), and pages (full views).
 
 pub mod components;
 pub mod layout;

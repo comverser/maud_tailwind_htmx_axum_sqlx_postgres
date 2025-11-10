@@ -1,9 +1,4 @@
 //! Application initialization functions.
-//!
-//! Provides setup for:
-//! - `init_logging`: Configures tracing subscriber with environment-based filtering
-//! - `init_database`: Establishes PostgreSQL connection pool and runs migrations
-//! - `init_session`: Sets up session management with PostgreSQL storage
 
 mod database;
 mod logging;

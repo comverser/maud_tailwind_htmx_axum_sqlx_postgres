@@ -2,7 +2,6 @@ use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 
 const TOKEN_LENGTH: usize = 32;
 
-/// Generate a secure random token for magic link authentication
 pub fn generate_token() -> String {
     use rand::RngCore;
     let mut rng = rand::rng();

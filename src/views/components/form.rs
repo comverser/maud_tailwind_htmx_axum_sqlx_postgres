@@ -1,6 +1,5 @@
 use maud::{Markup, html};
 
-/// Renders a form input field with optional error styling and message
 pub fn input(
     input_type: &str,
     name: &str,
@@ -28,7 +27,6 @@ pub fn input(
     }
 }
 
-/// Renders a primary submit button
 pub fn submit_button(text: &str) -> Markup {
     html! {
         button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" {
