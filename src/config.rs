@@ -1,11 +1,7 @@
 use axum::extract::FromRef;
 use sqlx::PgPool;
-use std::env::VarError;
 
-/// Site name used in page titles and branding.
-pub fn site_name() -> String {
-    dotenvy::var("SITE_NAME").expect("SITE_NAME must be set")
-}
+use crate::email::EmailConfig;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ConfigError {
@@ -13,20 +9,16 @@ pub enum ConfigError {
     MissingVar(String),
     #[error("Invalid value for {0}: {1}")]
     InvalidValue(String, String),
+    #[error("Email configuration error: {0}")]
+    Email(#[from] crate::email::EmailError),
 }
 
-impl From<VarError> for ConfigError {
-    fn from(e: VarError) -> Self {
-        match e {
-            VarError::NotPresent => ConfigError::MissingVar("unknown".to_string()),
-            VarError::NotUnicode(_) => ConfigError::InvalidValue("unknown".to_string(), "not valid unicode".to_string()),
-        }
-    }
-}
-
+#[derive(Clone)]
 pub struct AppConfig {
     server_addr: String,
     database_url: String,
+    site_name: String,
+    email: EmailConfig,
 }
 
 impl AppConfig {
@@ -37,9 +29,16 @@ impl AppConfig {
         let server_addr = dotenvy::var("SERVER_ADDR")
             .map_err(|_| ConfigError::MissingVar("SERVER_ADDR".to_string()))?;
 
+        let site_name = dotenvy::var("SITE_NAME")
+            .map_err(|_| ConfigError::MissingVar("SITE_NAME".to_string()))?;
+
+        let email = EmailConfig::from_env()?;
+
         Ok(Self {
             server_addr,
             database_url,
+            site_name,
+            email,
         })
     }
 
@@ -50,15 +49,24 @@ impl AppConfig {
     pub fn database_url(&self) -> &str {
         &self.database_url
     }
+
+    pub fn site_name(&self) -> &str {
+        &self.site_name
+    }
+
+    pub fn email(&self) -> &EmailConfig {
+        &self.email
+    }
 }
 
 #[derive(Clone, FromRef)]
 pub struct AppState {
     db: PgPool,
+    config: AppConfig,
 }
 
 impl AppState {
-    pub fn new(db: PgPool) -> Self {
-        Self { db }
+    pub fn new(db: PgPool, config: AppConfig) -> Self {
+        Self { db, config }
     }
 }

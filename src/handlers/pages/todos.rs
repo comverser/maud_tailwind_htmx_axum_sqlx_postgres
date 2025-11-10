@@ -1,9 +1,10 @@
 use axum::{Extension, extract::State};
-use crate::{auth::CurrentUser, data::queries, flash::FlashMessage, handlers::errors::HandlerError, views::pages};
+use crate::{auth::CurrentUser, config::AppConfig, data::queries, flash::FlashMessage, handlers::errors::HandlerError, views::pages};
 use maud::Markup;
 use sqlx::PgPool;
 
 pub async fn get_todos(
+    State(config): State<AppConfig>,
     State(db): State<PgPool>,
     Extension(current_user): Extension<CurrentUser>,
     Extension(flash): Extension<Option<FlashMessage>>,
@@ -12,5 +13,5 @@ pub async fn get_todos(
 
     let todos = queries::todo::get_todos_for_user(&db, user_id).await?;
 
-    Ok(pages::todos::todos(&current_user, flash.as_ref(), todos, None, None))
+    Ok(pages::todos::todos(&current_user, flash.as_ref(), config.site_name(), todos, None, None))
 }

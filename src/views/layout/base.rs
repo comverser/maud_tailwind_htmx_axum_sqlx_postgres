@@ -1,9 +1,8 @@
 use super::navigation;
-use crate::{auth::CurrentUser, config, flash::FlashMessage, paths, views::components};
+use crate::{auth::CurrentUser, constants::cdn, flash::FlashMessage, paths, views::components};
 use maud::{html, Markup, DOCTYPE};
 
-pub fn base_layout(current_user: &CurrentUser, flash: Option<&FlashMessage>, title: &str, meta_description: &str, content: Markup) -> Markup {
-    let site_name = config::site_name();
+pub fn base_layout(current_user: &CurrentUser, flash: Option<&FlashMessage>, site_name: &str, title: &str, meta_description: &str, content: Markup) -> Markup {
     html! {
         (DOCTYPE)
         html lang="en" {
@@ -17,15 +16,15 @@ pub fn base_layout(current_user: &CurrentUser, flash: Option<&FlashMessage>, tit
                 link rel="icon" type="image/svg+xml" href=(paths::static_files::FAVICON);
 
                 // Tailwind CSS CDN
-                script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" {}
+                script src=(cdn::TAILWIND_CSS_URL) {}
 
                 // HTMX CDN
-                script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"
-                    integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ"
+                script src=(cdn::HTMX_URL)
+                    integrity=(cdn::HTMX_INTEGRITY)
                     crossorigin="anonymous" {}
 
                 // Hyperscript CDN
-                script src="https://unpkg.com/hyperscript.org@0.9.14" {}
+                script src=(cdn::HYPERSCRIPT_URL) {}
             }
             body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col" {
                 (navigation::navbar(current_user))

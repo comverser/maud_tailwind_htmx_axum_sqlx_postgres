@@ -18,6 +18,7 @@ pub enum EmailError {
     Config(String),
 }
 
+#[derive(Clone)]
 pub struct EmailConfig {
     mode: EmailMode,
     from_address: String,
@@ -25,6 +26,7 @@ pub struct EmailConfig {
     base_url: String,
 }
 
+#[derive(Clone)]
 pub enum EmailMode {
     Console,
     Smtp {
@@ -37,8 +39,12 @@ pub enum EmailMode {
 
 impl EmailConfig {
     pub fn from_env() -> Result<Self, EmailError> {
-        let mode = match dotenvy::var("EMAIL_MODE").as_deref() {
-            Ok("smtp") => {
+        let mode_str = dotenvy::var("EMAIL_MODE")
+            .map_err(|_| EmailError::Config("EMAIL_MODE must be set".to_string()))?;
+
+        let mode = match mode_str.as_str() {
+            "console" => EmailMode::Console,
+            "smtp" => {
                 let host = dotenvy::var("SMTP_HOST")
                     .map_err(|_| EmailError::Config("SMTP_HOST must be set when EMAIL_MODE=smtp".to_string()))?;
                 let port = dotenvy::var("SMTP_PORT")
@@ -57,15 +63,15 @@ impl EmailConfig {
                     password,
                 }
             }
-            _ => EmailMode::Console,
+            _ => return Err(EmailError::Config(format!("EMAIL_MODE must be either 'console' or 'smtp', got '{}'", mode_str))),
         };
 
         let from_address = dotenvy::var("EMAIL_FROM_ADDRESS")
-            .expect("EMAIL_FROM_ADDRESS must be set");
+            .map_err(|_| EmailError::Config("EMAIL_FROM_ADDRESS must be set".to_string()))?;
         let from_name = dotenvy::var("EMAIL_FROM_NAME")
-            .expect("EMAIL_FROM_NAME must be set");
+            .map_err(|_| EmailError::Config("EMAIL_FROM_NAME must be set".to_string()))?;
         let base_url = dotenvy::var("BASE_URL")
-            .expect("BASE_URL must be set");
+            .map_err(|_| EmailError::Config("BASE_URL must be set".to_string()))?;
 
         Ok(Self {
             mode,

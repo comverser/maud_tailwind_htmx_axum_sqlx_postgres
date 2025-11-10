@@ -4,13 +4,20 @@ use axum::{
 };
 use thiserror::Error;
 
-use crate::{auth::CurrentUser, data::errors::DataError, views::pages::server_error};
+use crate::{auth::CurrentUser, constants::error_pages, data::errors::DataError, views::pages::server_error};
 
+/// Handler-level errors that can occur during request processing.
+///
+/// This wraps lower-level errors (database, session) and provides a consistent
+/// error response via `IntoResponse`. All handler errors are converted to appropriate
+/// HTTP responses with user-friendly error pages.
 #[derive(Error, Debug)]
 pub enum HandlerError {
+    /// Database or data access errors (not found, unauthorized, database failures)
     #[error("{0}")]
     Data(#[from] DataError),
 
+    /// Session management errors (read/write failures)
     #[error("{0}")]
     Session(#[from] tower_sessions::session::Error),
 }
@@ -30,6 +37,6 @@ impl IntoResponse for HandlerError {
             }
         };
 
-        (status, server_error::server_error(&CurrentUser::Guest, None, message)).into_response()
+        (status, server_error::server_error(&CurrentUser::Guest, None, error_pages::FALLBACK_SITE_NAME, message)).into_response()
     }
 }

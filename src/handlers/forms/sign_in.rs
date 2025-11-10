@@ -4,9 +4,10 @@ use validator::Validate;
 
 use crate::{
     auth::CurrentUser,
+    config::AppConfig,
     constants::messages,
     data::commands,
-    email::{self, EmailConfig},
+    email,
     flash::FlashMessage,
     magic_link,
     models::user::{FIELD_EMAIL, MagicLinkRequestForm},
@@ -19,13 +20,14 @@ use super::parse_validation_errors;
 
 /// Handle magic link request - sends an email with a sign-in link
 pub async fn post_forms_sign_in(
+    State(config): State<AppConfig>,
     State(db): State<PgPool>,
     Extension(current_user): Extension<CurrentUser>,
     session: Session,
     Form(form): Form<MagicLinkRequestForm>,
 ) -> Result<Response, crate::handlers::errors::HandlerError> {
     if let Err(validation_errors) = form.validate() {
-        return Ok(render_validation_errors(&current_user, &form, &validation_errors));
+        return Ok(render_validation_errors(&current_user, config.site_name(), &form, &validation_errors));
     }
 
     // Generate magic link token
@@ -35,17 +37,7 @@ pub async fn post_forms_sign_in(
     commands::magic_link::create_magic_link(&db, &form.email, &token).await?;
 
     // Send the magic link email
-    let email_config = match EmailConfig::from_env() {
-        Ok(config) => config,
-        Err(e) => {
-            tracing::error!("Email configuration error: {}", e);
-            return Ok(FlashMessage::error(messages::EMAIL_NOT_CONFIGURED)
-                .set_and_redirect(&session, paths::pages::SIGN_IN)
-                .await?);
-        }
-    };
-
-    if let Err(e) = email::send_magic_link(&email_config, &form.email, &token).await {
+    if let Err(e) = email::send_magic_link(config.email(), &form.email, &token).await {
         tracing::error!("Failed to send magic link email: {}", e);
         return Ok(FlashMessage::error(messages::EMAIL_SEND_FAILED)
             .set_and_redirect(&session, paths::pages::SIGN_IN)
@@ -60,6 +52,7 @@ pub async fn post_forms_sign_in(
 
 fn render_validation_errors(
     current_user: &CurrentUser,
+    site_name: &str,
     form: &MagicLinkRequestForm,
     validation_errors: &validator::ValidationErrors,
 ) -> Response {
@@ -69,6 +62,7 @@ fn render_validation_errors(
         sign_in::sign_in(
             current_user,
             None,
+            site_name,
             Some(&form.email),
             errors.get(FIELD_EMAIL).map(String::as_str),
         ),

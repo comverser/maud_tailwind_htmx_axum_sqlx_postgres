@@ -10,6 +10,7 @@ use maud::{html, Markup};
 pub fn sign_in(
     current_user: &CurrentUser,
     flash: Option<&FlashMessage>,
+    site_name: &str,
     email_value: Option<&str>,
     email_error: Option<&str>,
 ) -> Markup {
@@ -28,5 +29,5 @@ pub fn sign_in(
         }
     };
 
-    base_layout(current_user, flash, "Sign In", "Sign in", content)
+    base_layout(current_user, flash, site_name, "Sign In", "Sign in", content)
 }
