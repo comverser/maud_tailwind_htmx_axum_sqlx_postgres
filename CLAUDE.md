@@ -55,7 +55,7 @@ UI must be minimal and functional - no decoration.
 
 - No shadows, rounded corners, font weights, or decorative backgrounds
 - Simple borders for separation only
-- Single primary color (indigo-600)
+- Single consistent primary color
 - Hover for interaction, border change for focus
 - Tight spacing, maximum information density
 
