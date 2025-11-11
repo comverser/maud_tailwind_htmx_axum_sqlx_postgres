@@ -38,8 +38,8 @@ SITE_NAME="My App"
 
 # Email
 BASE_URL=http://127.0.0.1:8000
-EMAIL_FROM_ADDRESS=noreply@example.com
-EMAIL_FROM_NAME="My App"
+EMAIL_FROM_ADDRESS=your-email@your-domain.com
+EMAIL_FROM_NAME="Support"
 EMAIL_MODE=console  # "smtp" for production
 
 # Payments (get keys from app.tosspayments.com)
