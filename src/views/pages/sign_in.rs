@@ -16,9 +16,9 @@ pub fn sign_in(
 ) -> Markup {
     let content = html! {
         div class="max-w-sm mx-auto" {
-            h1 class="text-2xl font-semibold mb-4 text-center" { "Sign In" }
+            h1 class="text-xl mb-3" { "Sign In" }
 
-            form method="POST" action=(paths::forms::SIGN_IN) class="space-y-4" {
+            form method="POST" action=(paths::forms::SIGN_IN) class="space-y-3" {
                 (form::input("email", FIELD_EMAIL, "Email", email_value, email_error))
                 (form::submit_button("Send Magic Link"))
             }

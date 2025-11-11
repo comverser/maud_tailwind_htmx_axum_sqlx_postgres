@@ -16,27 +16,24 @@ pub fn dashboard(
 ) -> Markup {
     let content = html! {
         div class="max-w-4xl mx-auto" {
-            h1 class="text-2xl font-semibold mb-4" { "Orders" }
+            h1 class="text-xl mb-3" { "Orders" }
 
-            div class="bg-white shadow-md rounded-lg p-6" {
-
-                @if recent_orders.is_empty() {
-                    p class="text-gray-500 text-center py-8" { "No orders yet" }
-                } @else {
-                    div class="overflow-x-auto" {
-                        table class="w-full" {
-                            thead class="border-b" {
-                                tr {
-                                    th class="text-left py-2 px-3" { "Order #" }
-                                    th class="text-right py-2 px-3" { "Price" }
-                                    th class="text-center py-2 px-3" { "Status" }
-                                    th class="text-center py-2 px-3" { "Date" }
-                                }
+            @if recent_orders.is_empty() {
+                p class="text-gray-500 py-4" { "No orders yet" }
+            } @else {
+                div class="overflow-x-auto" {
+                    table class="w-full text-sm" {
+                        thead class="border-b" {
+                            tr {
+                                th class="text-left py-2 px-2" { "Order #" }
+                                th class="text-right py-2 px-2" { "Price" }
+                                th class="text-center py-2 px-2" { "Status" }
+                                th class="text-center py-2 px-2" { "Date" }
                             }
-                            tbody {
-                                @for order in recent_orders {
-                                    (order_row(&order))
-                                }
+                        }
+                        tbody {
+                            @for order in recent_orders {
+                                (order_row(&order))
                             }
                         }
                     }
@@ -65,21 +62,21 @@ fn order_row(order: &OrderSummary) -> Markup {
     };
 
     html! {
-        tr class="border-b hover:bg-gray-50" {
-            td class="py-3 px-3" {
+        tr class="border-b" {
+            td class="py-2 px-2" {
                 a href=(paths::with_param(paths::pages::QUOTE, "order_id", &order.order_id))
                     class="text-indigo-600 hover:underline"
                 {
                     (order.order_number)
                 }
             }
-            td class="py-3 px-3 text-right font-medium" { "₩" (order.price_amount) }
-            td class="py-3 px-3 text-center" {
-                span class={"px-2 py-1 rounded text-xs font-medium " (status_class)} {
+            td class="py-2 px-2 text-right" { "₩" (order.price_amount) }
+            td class="py-2 px-2 text-center" {
+                span class={"px-2 py-1 text-xs " (status_class)} {
                     (status_text)
                 }
             }
-            td class="py-3 px-3 text-center text-sm text-gray-600" { (date_display) }
+            td class="py-2 px-2 text-center text-gray-600" { (date_display) }
         }
     }
 }

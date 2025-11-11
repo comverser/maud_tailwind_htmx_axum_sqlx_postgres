@@ -13,33 +13,33 @@ pub fn checkout(
 
     let content = html! {
         div class="max-w-lg mx-auto" {
-            h1 class="text-2xl font-semibold mb-4" { "Checkout" }
+            h1 class="text-xl mb-3" { "Checkout" }
 
-            div class="bg-white rounded-lg shadow-md p-6" {
-                div class="space-y-2 mb-4" {
-                    div class="flex justify-between text-sm" {
+            div class="space-y-3" {
+                div class="space-y-1 text-sm" {
+                    div class="flex justify-between" {
                         span class="text-gray-600" { "File" }
-                        span class="font-medium" { (order.filename) }
+                        span { (order.filename) }
                     }
-                    div class="flex justify-between text-sm" {
+                    div class="flex justify-between" {
                         span class="text-gray-600" { "Characters" }
-                        span class="font-medium" { (order.text_length.to_string()) }
+                        span { (order.text_length.to_string()) }
                     }
                 }
 
-                div class="border-t pt-4 mb-4" {
+                div class="border-t pt-3 mb-3" {
                     div class="flex justify-between items-center" {
-                        span class="text-lg font-semibold" { "Total" }
-                        span class="text-2xl font-semibold text-indigo-600" { "₩" (format_price(order.price_amount)) }
+                        span { "Total" }
+                        span class="text-xl text-indigo-600" { "₩" (format_price(order.price_amount)) }
                     }
                 }
 
-                div id="payment-method" class="mb-4" {}
-                div id="agreement" class="mb-4" {}
+                div id="payment-method" class="mb-3" {}
+                div id="agreement" class="mb-3" {}
 
                 button
                     id="payment-button"
-                    class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    class="w-full bg-indigo-600 text-white px-3 py-2 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     { "Pay Now" }
             }
         }
