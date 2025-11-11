@@ -10,7 +10,7 @@ pub async fn get_root(
     Extension(flash): Extension<Option<FlashMessage>>,
 ) -> Result<Markup, HandlerError> {
     let user_email = match &current_user {
-        CurrentUser::Authenticated { user_id } => {
+        CurrentUser::Authenticated { user_id, .. } => {
             queries::user::get_user_email(&db, *user_id).await?
         }
         CurrentUser::Guest => None,

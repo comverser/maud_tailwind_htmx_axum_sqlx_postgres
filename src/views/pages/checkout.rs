@@ -8,8 +8,8 @@ pub fn checkout(
     order: &Order,
     client_key: &str,
 ) -> Markup {
-    let success_url = format!("/actions/payment/verify");
-    let fail_url = paths::with_param(paths::pages::QUOTE, "order_id", &order.order_id);
+    let success_url = "/actions/payment/verify".to_string();
+    let fail_url = paths::helpers::quote_path(&order.order_id);
 
     let content = html! {
         div class="max-w-lg mx-auto" {

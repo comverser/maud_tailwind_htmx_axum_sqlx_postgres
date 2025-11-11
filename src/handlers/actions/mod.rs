@@ -1,3 +1,4 @@
+pub mod admin;
 mod auth;
 mod payment;
 mod sign_out;

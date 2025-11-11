@@ -4,8 +4,9 @@ use uuid::Uuid;
 
 use crate::{constants::errors, data::errors::DataError};
 
-#[derive(Debug, Clone, Serialize, Deserialize, sqlx::Type)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, sqlx::Type)]
 #[sqlx(type_name = "text", rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
 pub enum PaymentStatus {
     Pending,
     Paid,
@@ -29,6 +30,15 @@ impl PaymentStatus {
             Self::Pending => "text-yellow-600",
             Self::Failed => "text-red-600",
             Self::Cancelled => "text-gray-600",
+        }
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Paid => "paid",
+            Self::Pending => "pending",
+            Self::Failed => "failed",
+            Self::Cancelled => "cancelled",
         }
     }
 }

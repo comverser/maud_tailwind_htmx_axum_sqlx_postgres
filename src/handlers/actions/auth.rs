@@ -1,7 +1,4 @@
-use axum::{
-    extract::{Query, State},
-    response::Response,
-};
+use axum::extract::{Query, State};
 use serde::Deserialize;
 use sqlx::PgPool;
 use tower_sessions::Session;
@@ -11,7 +8,7 @@ use crate::{
     constants::messages,
     data::commands,
     flash::FlashMessage,
-    handlers::errors::HandlerError,
+    handlers::errors::HandlerResult,
     paths,
 };
 
@@ -24,7 +21,7 @@ pub async fn get_actions_auth_verify(
     State(db): State<PgPool>,
     session: Session,
     Query(query): Query<VerifyQuery>,
-) -> Result<Response, HandlerError> {
+) -> HandlerResult {
     let email = match commands::magic_link::verify_and_consume_magic_link(&db, &query.token).await
     {
         Ok(email) => email,

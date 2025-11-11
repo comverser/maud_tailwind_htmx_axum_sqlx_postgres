@@ -9,3 +9,4 @@ pub mod fallback;
 pub mod forms;
 pub mod htmx;
 pub mod pages;
+pub mod pagination;

@@ -4,8 +4,7 @@ use sqlx::PgPool;
 pub async fn get_or_create_user(db: &PgPool, email: &str) -> Result<i32, DataError> {
     let existing = sqlx::query!("SELECT user_id FROM users WHERE email = $1", email)
         .fetch_optional(db)
-        .await
-        .map_err(DataError::Database)?;
+        .await?;
 
     if let Some(row) = existing {
         return Ok(row.user_id);
@@ -16,8 +15,7 @@ pub async fn get_or_create_user(db: &PgPool, email: &str) -> Result<i32, DataErr
         email
     )
     .fetch_one(db)
-    .await
-    .map_err(DataError::Database)?;
+    .await?;
 
     Ok(row.user_id)
 }

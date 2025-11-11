@@ -1,3 +1,4 @@
+pub mod admin;
 mod checkout;
 mod dashboard;
 mod quote;

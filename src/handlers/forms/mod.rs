@@ -1,3 +1,4 @@
+pub mod admin;
 mod contact;
 mod sign_in;
 mod text_analyzer;

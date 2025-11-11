@@ -29,7 +29,11 @@ pub const SESSION_USER_ID_KEY: &str = "authenticated_user_id";
 #[derive(Clone, Debug)]
 pub enum CurrentUser {
     /// An authenticated user with a valid session
-    Authenticated { user_id: i32 },
+    Authenticated {
+        user_id: i32,
+        email: String,
+        is_admin: bool,
+    },
     /// A guest user (not authenticated)
     Guest,
 }
@@ -53,12 +57,19 @@ impl CurrentUser {
     /// 3. The handler is actually in a protected route group
     pub fn require_authenticated(&self) -> i32 {
         match self {
-            CurrentUser::Authenticated { user_id } => *user_id,
+            CurrentUser::Authenticated { user_id, .. } => *user_id,
             CurrentUser::Guest => unreachable!(
                 "Protected route accessed by guest user. This indicates a middleware \
                 configuration error. Ensure the route is in protected_routes() and \
                 middleware ordering is correct."
             ),
+        }
+    }
+
+    pub fn is_admin(&self) -> bool {
+        match self {
+            CurrentUser::Authenticated { is_admin, .. } => *is_admin,
+            CurrentUser::Guest => false,
         }
     }
 }

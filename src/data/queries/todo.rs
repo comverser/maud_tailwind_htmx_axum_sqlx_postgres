@@ -8,8 +8,7 @@ pub async fn get_todos_for_user(db: &PgPool, user_id: i32) -> Result<Vec<Todo>, 
         user_id
     )
     .fetch_all(db)
-    .await
-    .map_err(DataError::Database)?;
+    .await?;
 
     Ok(todos)
 }

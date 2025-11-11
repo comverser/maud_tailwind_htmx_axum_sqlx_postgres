@@ -6,6 +6,9 @@ use thiserror::Error;
 
 use crate::{auth::CurrentUser, constants::error_pages, data::errors::DataError, views::pages::server_error};
 
+/// Type alias for handler results, defaulting to Response.
+pub type HandlerResult<T = Response> = Result<T, HandlerError>;
+
 /// Handler-level errors that can occur during request processing.
 ///
 /// Wraps lower-level errors and provides consistent HTTP responses via `IntoResponse`.
@@ -23,6 +26,7 @@ impl IntoResponse for HandlerError {
         let (status, message) = match &self {
             Self::Data(DataError::NotFound(msg)) => (StatusCode::NOT_FOUND, *msg),
             Self::Data(DataError::Unauthorized(msg)) => (StatusCode::UNAUTHORIZED, *msg),
+            Self::Data(DataError::InvalidInput(msg)) => (StatusCode::BAD_REQUEST, msg.as_str()),
             Self::Data(DataError::Database(e)) => {
                 tracing::error!(error = %e, "Database error in handler");
                 (StatusCode::INTERNAL_SERVER_ERROR, "Internal server error")

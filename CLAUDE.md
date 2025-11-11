@@ -8,6 +8,14 @@ This is a **template repository** for web applications. Keep everything minimal 
 
 ---
 
+## Important: Modifying This File
+
+**Do not modify CLAUDE.md unless explicitly ordered by the user.**
+
+This file contains the core development guidelines and should only be updated when the user directly requests changes to these guidelines.
+
+---
+
 ## Code Principles
 
 ### Single Standard
@@ -28,9 +36,9 @@ Don't abstract until duplication appears.
 - Inline is fine for single use
 
 ### Comments
-Only write durable comments that won't become stale.
-- Document architecture and "why", not implementation "what"
-- Examples: middleware ordering, safety assumptions, CQRS rationale
+Only durable comments that won't become stale.
+- Document "why" and architecture, not "what"
+- Examples: middleware ordering, safety assumptions
 
 ### General
 - Follow modern Rust conventions
@@ -41,13 +49,11 @@ Only write durable comments that won't become stale.
 
 ## UI Principles
 
-### Essential Elements Only
 Minimal and functional - no decoration.
 - No shadows, rounded corners, font weights, or decorative backgrounds
-- Simple borders for separation only
-- Single consistent primary color
+- Simple borders, single primary color
 - Hover for interaction, border change for focus
-- Tight spacing, maximum information density
+- Tight spacing, maximum density
 
 ---
 
@@ -67,8 +73,7 @@ DELETE /actions/todos/{id} → delete_...  (actions - state changes)
 - Handler names: `method_type_resource_[param]_[action]`
 
 ### Paths
-- **No hardcoded paths** - define all in `src/paths.rs`
-- Single source of truth for URLs
+- No hardcoded paths - define all in `src/paths.rs`
 
 ### Naming
 - URLs: `snake_case`
@@ -76,10 +81,9 @@ DELETE /actions/todos/{id} → delete_...  (actions - state changes)
 - Module structure mirrors route types: `handlers/forms/`, `handlers/actions/`, `handlers/pages/`
 
 ### Configuration
-- All config required - use `.expect()` with clear messages
-- No env var defaults - must be set explicitly
-- Fail fast at startup
-- Constants in `src/constants.rs` (not env var defaults)
+- All config required - `.expect()` with clear messages
+- No env var defaults - fail fast at startup
+- True constants in `src/constants.rs`
 
 ---
 

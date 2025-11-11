@@ -31,6 +31,14 @@ pub mod pages {
     pub const QUOTE: &str = "/quote/{order_id}";
     pub const CHECKOUT: &str = "/checkout/{order_id}";
     pub const RESULT: &str = "/result/{order_id}";
+
+    pub mod admin {
+        pub const HOME: &str = "/admin";
+        pub const USERS: &str = "/admin/users";
+        pub const USER_DETAIL: &str = "/admin/users/{user_id}";
+        pub const ORDERS: &str = "/admin/orders";
+        pub const ORDER_DETAIL: &str = "/admin/orders/{order_id}";
+    }
 }
 
 pub mod forms {
@@ -40,6 +48,10 @@ pub mod forms {
         CONTACT => "/contact",
         TEXT_ANALYZER => "/text_analyzer",
     });
+
+    pub mod admin {
+        pub const GRANT_ROLE: &str = "/forms/admin/users/{user_id}/grant-role";
+    }
 }
 
 pub mod actions {
@@ -51,6 +63,10 @@ pub mod actions {
         PAYMENT_INITIATE => "/payment/initiate",
         PAYMENT_VERIFY => "/payment/verify",
     });
+
+    pub mod admin {
+        pub const REVOKE_ROLE: &str = "/actions/admin/users/{user_id}/revoke-role";
+    }
 }
 
 pub mod static_files {
@@ -61,4 +77,38 @@ pub mod static_files {
 
 pub fn with_param(path: &str, param_name: &str, value: &impl ToString) -> String {
     path.replace(&format!("{{{}}}", param_name), &value.to_string())
+}
+
+pub fn with_query_param(base: &str, key: &str, value: &str) -> String {
+    format!("{}?{}={}", base, key, value)
+}
+
+pub fn with_page(base: &str, page: i64) -> String {
+    with_query_param(base, "page", &page.to_string())
+}
+
+/// Common path builders for frequently used routes
+pub mod helpers {
+    use super::*;
+    use uuid::Uuid;
+
+    pub fn user_detail_path(user_id: i32) -> String {
+        with_param(pages::admin::USER_DETAIL, "user_id", &user_id)
+    }
+
+    pub fn order_detail_path(order_id: impl ToString) -> String {
+        with_param(pages::admin::ORDER_DETAIL, "order_id", &order_id)
+    }
+
+    pub fn quote_path(order_id: &Uuid) -> String {
+        with_param(pages::QUOTE, "order_id", order_id)
+    }
+
+    pub fn checkout_path(order_id: &Uuid) -> String {
+        with_param(pages::CHECKOUT, "order_id", order_id)
+    }
+
+    pub fn result_path(order_id: &Uuid) -> String {
+        with_param(pages::RESULT, "order_id", order_id)
+    }
 }

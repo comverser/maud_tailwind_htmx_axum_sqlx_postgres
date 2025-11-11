@@ -1,4 +1,5 @@
 use crate::{
+    constants::errors,
     data::{ensure_rows_affected, errors::DataError},
     models::todo::Todo,
 };
@@ -11,8 +12,7 @@ pub async fn create_todo(db: &PgPool, user_id: i32, task: &str) -> Result<(), Da
         user_id
     )
     .execute(db)
-    .await
-    .map_err(DataError::Database)?;
+    .await?;
 
     Ok(())
 }
@@ -32,7 +32,7 @@ pub async fn toggle_todo_returning(
     )
     .fetch_one(db)
     .await
-    .map_err(|e| crate::data::map_row_not_found(e, "Todo not found"))?;
+    .map_err(|e| crate::data::map_row_not_found(e, errors::TODO_NOT_FOUND))?;
 
     Ok(todo)
 }
@@ -44,8 +44,7 @@ pub async fn delete_todo(db: &PgPool, user_id: i32, todo_id: i32) -> Result<(), 
         user_id
     )
     .execute(db)
-    .await
-    .map_err(DataError::Database)?;
+    .await?;
 
-    ensure_rows_affected(result, "Todo not found")
+    ensure_rows_affected(result, errors::TODO_NOT_FOUND)
 }

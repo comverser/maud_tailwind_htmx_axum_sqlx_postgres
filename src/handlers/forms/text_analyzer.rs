@@ -25,7 +25,7 @@ pub async fn post_forms_text_analyzer(
 
     while let Some(field) = multipart.next_field().await.map_err(|e| {
         tracing::error!("Multipart error: {}", e);
-        DataError::Database(sqlx::Error::Protocol(e.to_string()))
+        DataError::InvalidInput(format!("Failed to process multipart data: {}", e))
     })? {
         let field_name = field.name().unwrap_or("").to_string();
 
@@ -33,20 +33,20 @@ pub async fn post_forms_text_analyzer(
             filename = field.file_name().map(|s| s.to_string());
             let data = field.bytes().await.map_err(|e| {
                 tracing::error!("Failed to read file: {}", e);
-                DataError::Database(sqlx::Error::Protocol(e.to_string()))
+                DataError::InvalidInput(format!("Failed to read file: {}", e))
             })?;
 
             file_size = Some(data.len());
 
             if data.len() > file_upload::MAX_FILE_SIZE {
-                return Ok(FlashMessage::error(&format!("File too large. Maximum size is {} MB.", file_upload::MAX_FILE_SIZE / 1024 / 1024))
+                return Ok(FlashMessage::error(format!("File too large. Maximum size is {} MB.", file_upload::MAX_FILE_SIZE / 1024 / 1024))
                     .set_and_redirect(&session, paths::pages::TEXT_ANALYZER)
                     .await?);
             }
 
             text_content = Some(String::from_utf8(data.to_vec()).map_err(|e| {
                 tracing::error!("Invalid UTF-8 in file: {}", e);
-                DataError::Database(sqlx::Error::Protocol("File must be valid UTF-8 text".to_string()))
+                DataError::InvalidInput("File must be valid UTF-8 text".to_string())
             })?);
         }
     }
@@ -63,14 +63,16 @@ pub async fn post_forms_text_analyzer(
 
     let order = commands::order::create_order(
         &db,
-        user_id,
-        &filename,
-        file_size,
-        &text_content,
-        text_length,
-        price_amount,
-        &order_number,
+        commands::order::CreateOrderParams {
+            user_id,
+            filename,
+            file_size,
+            text_content,
+            text_length,
+            price_amount,
+            order_number,
+        },
     ).await?;
 
-    Ok(Redirect::to(&paths::with_param(paths::pages::QUOTE, "order_id", &order.order_id)).into_response())
+    Ok(Redirect::to(&paths::helpers::quote_path(&order.order_id)).into_response())
 }

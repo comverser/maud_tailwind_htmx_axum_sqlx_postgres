@@ -1,3 +1,4 @@
+pub mod admin;
 pub mod magic_link;
 pub mod order;
 pub mod todo;

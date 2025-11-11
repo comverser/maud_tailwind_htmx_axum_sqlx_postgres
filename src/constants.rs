@@ -27,14 +27,19 @@ pub mod messages {
     pub const PAYMENT_FAILED: &str = "Payment failed. Please try again.";
     pub const SIGN_IN_REQUIRED: &str = "Please sign in to continue";
     pub const ORDER_ALREADY_PROCESSED: &str = "Order already processed";
+    pub const ADMIN_ROLE_GRANTED: &str = "Admin role granted";
+    pub const ADMIN_ROLE_REVOKED: &str = "Admin role revoked";
 }
 
 pub mod errors {
     pub const ORDER_NOT_FOUND: &str = "Order not found";
+    pub const TODO_NOT_FOUND: &str = "Todo not found";
     pub const PAYMENT_NOT_COMPLETED: &str = "Payment not completed";
     pub const NOT_YOUR_ORDER: &str = "Not your order";
     pub const NO_FILE_PROVIDED: &str = "No file provided";
     pub const NO_FILE_CONTENT: &str = "No file content";
+    pub const FORBIDDEN: &str = "You don't have permission to access this resource";
+    pub const CANNOT_REVOKE_OWN_ADMIN: &str = "Cannot revoke your own admin role";
 }
 
 pub mod pricing {
@@ -53,4 +58,9 @@ pub mod file_upload {
 
 pub mod logging {
     pub const UNKNOWN_CLIENT_IP: &str = "unknown";
+}
+
+pub mod admin {
+    pub const ITEMS_PER_PAGE: i64 = 20;
+    pub const ROLE_ADMIN: &str = "admin";
 }

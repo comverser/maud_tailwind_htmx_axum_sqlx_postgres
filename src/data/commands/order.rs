@@ -3,16 +3,17 @@ use uuid::Uuid;
 
 use crate::{data::errors::DataError, models::order::{Order, PaymentStatus}};
 
-pub async fn create_order(
-    db: &PgPool,
-    user_id: i32,
-    filename: &str,
-    file_size: i32,
-    text_content: &str,
-    text_length: i32,
-    price_amount: i32,
-    order_number: &str,
-) -> Result<Order, DataError> {
+pub struct CreateOrderParams {
+    pub user_id: i32,
+    pub filename: String,
+    pub file_size: i32,
+    pub text_content: String,
+    pub text_length: i32,
+    pub price_amount: i32,
+    pub order_number: String,
+}
+
+pub async fn create_order(db: &PgPool, params: CreateOrderParams) -> Result<Order, DataError> {
     let order = sqlx::query_as!(
         Order,
         r#"
@@ -32,14 +33,14 @@ pub async fn create_order(
             created_at,
             paid_at
         "#,
-        user_id,
-        filename,
-        file_size,
-        text_content,
-        text_length,
-        price_amount,
+        params.user_id,
+        params.filename,
+        params.file_size,
+        params.text_content,
+        params.text_length,
+        params.price_amount,
         PaymentStatus::Pending as PaymentStatus,
-        order_number
+        params.order_number
     )
     .fetch_one(db)
     .await?;

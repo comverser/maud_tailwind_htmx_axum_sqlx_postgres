@@ -14,4 +14,7 @@ pub enum DataError {
 
     #[error("{0}")]
     Unauthorized(&'static str),
+
+    #[error("{0}")]
+    InvalidInput(String),
 }

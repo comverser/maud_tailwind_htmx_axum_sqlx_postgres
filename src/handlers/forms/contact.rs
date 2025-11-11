@@ -1,5 +1,6 @@
 use axum::{Extension, Form, extract::State, http::StatusCode, response::{IntoResponse, Response}};
 use sqlx::PgPool;
+use tower_sessions::Session;
 use validator::Validate;
 
 use crate::{
@@ -13,7 +14,6 @@ use crate::{
     paths,
     views::pages::root,
 };
-use tower_sessions::Session;
 
 use super::parse_validation_errors;
 
@@ -25,10 +25,10 @@ pub async fn post_forms_contact(
     Form(form): Form<ContactForm>,
 ) -> Result<Response, crate::handlers::errors::HandlerError> {
     let email_to_use = match &current_user {
-        CurrentUser::Authenticated { user_id } => {
+        CurrentUser::Authenticated { user_id, email, .. } => {
             queries::user::get_user_email(&db, *user_id)
                 .await?
-                .unwrap_or(form.email.clone())
+                .unwrap_or_else(|| email.clone())
         }
         CurrentUser::Guest => {
             if let Err(validation_errors) = form.validate() {

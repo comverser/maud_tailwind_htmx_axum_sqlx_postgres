@@ -4,6 +4,7 @@
 //! Authentication enforcement is applied at the route group level via middleware.
 
 mod actions;
+mod admin;
 mod forms;
 mod pages;
 
@@ -23,9 +24,12 @@ pub fn create_routes(state: AppState, session_layer: SessionManagerLayer<Postgre
 }
 
 fn app_routes(state: AppState, session_layer: SessionManagerLayer<PostgresStore>) -> Router {
+    let state_clone = state.clone();
+
     Router::new()
         .merge(public_routes())
         .merge(protected_routes())
+        .merge(admin_routes())
         .fallback(handlers::fallback::handle_404)
         .with_state(state)
         // CRITICAL: Middleware ordering matters! Layers are applied bottom-to-top (last to first).
@@ -36,8 +40,13 @@ fn app_routes(state: AppState, session_layer: SessionManagerLayer<PostgresStore>
         //
         // This ordering ensures CurrentUser is available to all handlers.
         // See also: protected_routes() for authentication enforcement.
-        .layer(middleware::from_fn(middlewares::session_context))
+        .layer(middleware::from_fn_with_state(state_clone, middlewares::session_context))
         .layer(session_layer)
+}
+
+fn admin_routes() -> Router<AppState> {
+    admin::admin_routes()
+        .layer(middleware::from_fn(middlewares::require_authentication))
 }
 
 /// Public routes accessible to all users (authenticated and guests)

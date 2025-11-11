@@ -1,4 +1,4 @@
-use crate::constants::auth::MAGIC_LINK_EXPIRY_MINUTES;
+use crate::constants::{auth::MAGIC_LINK_EXPIRY_MINUTES, messages};
 use crate::data::{errors::DataError, map_row_unauthorized};
 use sqlx::PgPool;
 use time::{Duration, OffsetDateTime};
@@ -12,8 +12,7 @@ pub async fn create_magic_link(
 
     sqlx::query!("DELETE FROM magic_links WHERE email = $1", email)
         .execute(db)
-        .await
-        .map_err(DataError::Database)?;
+        .await?;
 
     sqlx::query!(
         "INSERT INTO magic_links(token, email, expires_at) VALUES($1, $2, $3)",
@@ -22,8 +21,7 @@ pub async fn create_magic_link(
         expires_at
     )
     .execute(db)
-    .await
-    .map_err(DataError::Database)?;
+    .await?;
 
     Ok(())
 }
@@ -43,7 +41,7 @@ pub async fn verify_and_consume_magic_link(
     )
     .fetch_one(db)
     .await
-    .map_err(|e| map_row_unauthorized(e, "Invalid or expired magic link"))?;
+    .map_err(|e| map_row_unauthorized(e, messages::MAGIC_LINK_INVALID))?;
 
     Ok(row.email)
 }

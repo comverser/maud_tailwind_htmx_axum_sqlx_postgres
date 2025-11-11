@@ -31,11 +31,11 @@ pub async fn post_actions_payment_initiate(
 
     if !matches!(order.payment_status, PaymentStatus::Pending) {
         return Ok(FlashMessage::error(messages::ORDER_ALREADY_PROCESSED)
-            .set_and_redirect(&session, &paths::with_param(paths::pages::QUOTE, "order_id", &order.order_id))
+            .set_and_redirect(&session, &paths::helpers::quote_path(&order.order_id))
             .await?);
     }
 
-    let checkout_url = paths::with_param(paths::pages::CHECKOUT, "order_id", &order.order_id);
+    let checkout_url = paths::helpers::checkout_path(&order.order_id);
     Ok(Redirect::to(&checkout_url).into_response())
 }
 
@@ -71,7 +71,7 @@ pub async fn get_actions_payment_verify(
     if query.amount != order.price_amount {
         tracing::error!("Payment amount mismatch: expected {}, got {}", order.price_amount, query.amount);
         return Ok(FlashMessage::error(messages::PAYMENT_FAILED)
-            .set_and_redirect(&session, &paths::with_param(paths::pages::QUOTE, "order_id", &order.order_id))
+            .set_and_redirect(&session, &paths::helpers::quote_path(&order.order_id))
             .await?);
     }
 
@@ -86,7 +86,7 @@ pub async fn get_actions_payment_verify(
     let client = reqwest::Client::new();
     let response = client
         .post(crate::constants::payment::TOSS_API_CONFIRM_URL)
-        .basic_auth(&secret_key, Some(""))
+        .basic_auth(secret_key, Some(""))
         .json(&confirm_request)
         .send()
         .await;
@@ -101,7 +101,7 @@ pub async fn get_actions_payment_verify(
             ).await?;
 
             Ok(FlashMessage::success(messages::PAYMENT_SUCCESS)
-                .set_and_redirect(&session, &paths::with_param(paths::pages::RESULT, "order_id", &order.order_id))
+                .set_and_redirect(&session, &paths::helpers::result_path(&order.order_id))
                 .await?)
         }
         Ok(resp) => {
@@ -116,13 +116,13 @@ pub async fn get_actions_payment_verify(
             ).await?;
 
             Ok(FlashMessage::error(messages::PAYMENT_FAILED)
-                .set_and_redirect(&session, &paths::with_param(paths::pages::QUOTE, "order_id", &order.order_id))
+                .set_and_redirect(&session, &paths::helpers::quote_path(&order.order_id))
                 .await?)
         }
         Err(e) => {
             tracing::error!("Failed to call Toss API: {}", e);
             Ok(FlashMessage::error(messages::PAYMENT_FAILED)
-                .set_and_redirect(&session, &paths::with_param(paths::pages::QUOTE, "order_id", &order.order_id))
+                .set_and_redirect(&session, &paths::helpers::quote_path(&order.order_id))
                 .await?)
         }
     }
