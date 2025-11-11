@@ -13,9 +13,9 @@ A production-ready Rust web application template with authentication, payments, 
 
 ## Tech Stack
 
-**Backend:** Axum • PostgreSQL + SQLx • Maud templates
-**Frontend:** HTMX • Tailwind CSS
-**Auth:** Magic links • tower-sessions
+**Backend:** Axum • PostgreSQL + SQLx • Maud templates<br>
+**Frontend:** HTMX • Tailwind CSS<br>
+**Auth:** Magic links • tower-sessions<br>
 **Payments:** Toss Payments
 
 ## Quick Start
