@@ -8,9 +8,9 @@ pub fn input(
     error: Option<&str>,
 ) -> Markup {
     let input_class = if error.is_some() {
-        "w-full px-3 py-2 border-2 border-red-500 rounded focus:outline-none focus:border-red-600"
+        "w-full px-3 py-2 border border-red-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
     } else {
-        "w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
+        "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
     };
 
     html! {
@@ -29,7 +29,7 @@ pub fn input(
 
 pub fn submit_button(text: &str) -> Markup {
     html! {
-        button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" {
+        button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium" {
             (text)
         }
     }

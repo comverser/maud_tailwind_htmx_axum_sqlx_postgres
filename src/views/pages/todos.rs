@@ -17,15 +17,15 @@ pub fn todos(
 ) -> Markup {
     let content = html! {
         div class="max-w-2xl mx-auto" {
-            h1 class="text-2xl font-bold mb-6" { "Todos" }
+            h1 class="text-2xl font-semibold mb-4" { "Todos" }
 
-            form method="POST" action=(paths::forms::TODOS) class="mb-6 space-y-4" {
+            form method="POST" action=(paths::forms::TODOS) class="mb-4 space-y-4" {
                 (form::input("text", FIELD_TASK, "New Todo", task_value, task_error))
                 (form::submit_button("Add Todo"))
             }
 
             @if todos.is_empty() {
-                p class="text-gray-500 text-center py-8" { "No todos yet. Add one above!" }
+                p class="text-gray-500 text-center py-8" { "No todos yet" }
             } @else {
                 ul class="space-y-2" {
                     @for todo in todos {
@@ -41,7 +41,7 @@ pub fn todos(
 
 pub fn todo_item(todo: &Todo) -> Markup {
     html! {
-        li class="flex items-center gap-3 p-3 bg-white border rounded-lg" id={"todo-" (todo.todo_id)} {
+        li class="flex items-center gap-3 p-3 bg-white shadow-md rounded-lg" id={"todo-" (todo.todo_id)} {
             form
                 hx-patch={(paths::with_param(paths::actions::TODOS_TODO_ID_TOGGLE, "todo_id", &todo.todo_id))}
                 hx-target={"#todo-" (todo.todo_id)}
@@ -52,7 +52,7 @@ pub fn todo_item(todo: &Todo) -> Markup {
                     type="checkbox"
                     checked[todo.is_done]
                     onchange="this.form.requestSubmit()"
-                    class="w-5 h-5 cursor-pointer";
+                    class="w-5 h-5 cursor-pointer rounded focus:outline-none focus:ring-2 focus:ring-indigo-500";
             }
 
             span class={
@@ -71,7 +71,7 @@ pub fn todo_item(todo: &Todo) -> Markup {
             {
                 button
                     type="submit"
-                    class="text-red-600 hover:text-red-800 px-2 py-1"
+                    class="text-red-600 hover:text-red-700 px-2 py-1"
                 {
                     "Delete"
                 }

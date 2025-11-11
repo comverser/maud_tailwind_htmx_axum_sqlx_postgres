@@ -16,9 +16,9 @@ pub fn dashboard(
 ) -> Markup {
     let content = html! {
         div class="max-w-4xl mx-auto" {
-            h1 class="text-2xl font-bold mb-4" { "Orders" }
+            h1 class="text-2xl font-semibold mb-4" { "Orders" }
 
-            div class="bg-white border rounded-lg p-6" {
+            div class="bg-white shadow-md rounded-lg p-6" {
 
                 @if recent_orders.is_empty() {
                     p class="text-gray-500 text-center py-8" { "No orders yet" }
@@ -68,7 +68,7 @@ fn order_row(order: &OrderSummary) -> Markup {
         tr class="border-b hover:bg-gray-50" {
             td class="py-3 px-3" {
                 a href=(paths::with_param(paths::pages::QUOTE, "order_id", &order.order_id))
-                    class="text-blue-600 hover:underline"
+                    class="text-indigo-600 hover:underline"
                 {
                     (order.order_number)
                 }

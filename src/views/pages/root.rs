@@ -11,9 +11,10 @@ pub fn root(
     message_error: Option<&str>,
 ) -> Markup {
     let content = html! {
-        div class="max-w-2xl mx-auto" {
+        div class="max-w-lg mx-auto" {
+            h1 class="text-2xl font-semibold mb-4" { "Contact" }
+
             div class="bg-white rounded-lg shadow-md p-6" {
-                h1 class="text-2xl font-semibold text-gray-900 mb-4" { "Contact" }
 
                 form method="post" action=(paths::forms::CONTACT) class="space-y-4" {
                     @match current_user {
@@ -26,7 +27,7 @@ pub fn root(
                                     name="email"
                                     value=[email]
                                     readonly
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 cursor-not-allowed"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
                                     placeholder="your@email.com";
                                 @if let Some(error) = email_error {
                                     p class="text-red-600 text-sm mt-1" { (error) }
@@ -42,7 +43,7 @@ pub fn root(
                                     name="email"
                                     value=[email]
                                     required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     placeholder="your@email.com";
                                 @if let Some(error) = email_error {
                                     p class="text-red-600 text-sm mt-1" { (error) }
@@ -58,7 +59,7 @@ pub fn root(
                             name="message"
                             required
                             rows="5"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             placeholder="Your message..." { (message.unwrap_or("")) }
                         @if let Some(error) = message_error {
                             p class="text-red-600 text-sm mt-1" { (error) }
@@ -67,7 +68,7 @@ pub fn root(
 
                     button
                         type="submit"
-                        class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
                         { "Send Message" }
                 }
             }
