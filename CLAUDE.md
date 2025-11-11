@@ -1,122 +1,91 @@
 # Guidelines for Claude Code
 
-## Project Overview
+## Overview
 
-### Purpose
-This is a **template repository** for web applications. Keep all views and UI minimal and generic to serve as a starting point for various projects.
+This is a **template repository** for web applications. Keep everything minimal and generic.
 
-### Tech Stack
-- **Backend**: Axum (Rust web framework)
-- **Database**: PostgreSQL with SQLx
-- **Templates**: Maud (compile-time HTML templates)
-- **Frontend**: HTMX + Tailwind CSS
-- **Sessions**: tower-sessions with PostgreSQL store
+**Tech Stack:** Axum • PostgreSQL + SQLx • Maud • HTMX + Tailwind CSS • tower-sessions
 
 ---
 
-## Core Principles
+## Code Principles
 
-### Single Standard Principle
-When handling the same case multiple times, use exactly one consistent approach.
+### Single Standard
+One consistent approach for each case.
+- Extract to single function if handling same case differently
+- No mixed patterns
 
-- If you find yourself handling the same case in different ways, extract to a single function
-- Example: If multiple places need to read env vars with validation, create one helper. Don't mix patterns.
+### Explicit Over Implicit
+Fail fast with clear errors.
+- Make everything required, no optional/default patterns
+- Use `.expect("VARIABLE_NAME must be set")` for required values
+- Constants for repeated values, no magic numbers
+- Panic early at startup, not silently during runtime
 
-### Be Explicit Over Implicit
-Make everything clear and fail fast with explicit errors.
-
-- **Make everything required** - don't create optional/default patterns
-- **Don't handle "if not set" cases** - if something is needed, require it with `.expect()`
-- **Fail fast** with explicit errors at startup rather than silent defaults
-- **Use simpler constructs**: `unwrap_or(value)` not `unwrap_or_else(|| value)` when value is already available
-- **No magic values** - use constants for values that appear in multiple places
-- **Clear error messages** - `.expect("VARIABLE_NAME must be set")` not just `.expect()`
-- If it can be wrong, make it impossible to ignore - panic early with clear messages
-
-### Keep Code Simple
+### Keep It Simple
 Don't abstract until duplication appears.
+- Wait for second use before extracting
+- Inline is fine for single use
 
-- Wait for the second use before extracting
-- Inline is fine for single use - don't premature optimize
-- Extract when you find duplication, not before
+### Comments
+Only write durable comments that won't become stale.
+- Document architecture and "why", not implementation "what"
+- Examples: middleware ordering, safety assumptions, CQRS rationale
 
-### Write Durable Comments
-Write comments only when they are truly important and likely to remain accurate.
+### General
+- Follow modern Rust conventions
+- Minimize symbol visibility (private by default)
+- Breaking changes acceptable - this is a template
 
-- **Favor architectural comments over implementation details** - Document *why* and *how things work together*, not *what* the code does
-- **Avoid case-specific comments** - Comments tied to specific implementation details may become invalid as the template evolves
-- **Write timeless comments** - Focus on patterns, safety requirements, and architectural decisions that will remain relevant
-- **Good examples**: Middleware ordering requirements, safety assumptions, CQRS separation rationale
-- **Avoid**: Comments describing specific field names, current values, or temporary states
-- **When in doubt, skip it** - Code should be self-documenting through clear naming; only add comments for non-obvious decisions
+---
+
+## UI Principles
 
 ### Essential Elements Only
-UI must be minimal and functional - no decoration.
-
+Minimal and functional - no decoration.
 - No shadows, rounded corners, font weights, or decorative backgrounds
 - Simple borders for separation only
 - Single consistent primary color
 - Hover for interaction, border change for focus
 - Tight spacing, maximum information density
 
-### Other Principles
-- Follow modern Rust conventions
-- Minimize symbol visibility: prefer private unless public is required
-- **Don't care about backward compatibility**: This is a template in active development - breaking changes are acceptable for improvements
-
 ---
 
-## Architecture & Organization
+## Architecture
 
-### Routing & API Design
-**Type-first organization**: Routes organized by interaction type (`/forms/*`, `/actions/*`, `/pages/*`)
+### Type-First Routing
+Routes organized by interaction type: `/pages/*`, `/forms/*`, `/actions/*`
 
-- **RESTful within type**: Use proper HTTP methods (DELETE, PATCH, PUT) and path parameters for resources
-- **Path parameters for resource identification**: `/forms/todos/{todo_id}` instead of `todo_id` in body
-
-**Route Structure Examples:**
 ```http
-Pages (GET only):
-  GET /              → get_root
-  GET /todos         → get_todos
-  GET /sign_in       → get_sign_in
-
-Forms (with form data):
-  POST   /forms/sign_in                    → post_forms_sign_in
-  POST   /forms/todos                      → post_forms_todos
-  POST   /forms/todos/{todo_id}/toggle     → post_forms_todos_todo_id_toggle
-
-Actions (state changes, typically no form data):
-  POST   /actions/sign_out                 → post_actions_sign_out
-  DELETE /actions/todos/{todo_id}          → delete_actions_todos_todo_id
+GET /              → get_root             (pages - render HTML)
+POST /forms/todos  → post_forms_todos    (forms - submit data)
+DELETE /actions/todos/{id} → delete_...  (actions - state changes)
 ```
 
-### Path Management
-- **No hardcoded paths** - All paths must be defined in the `paths` module
-- **Single source of truth** - All URL structure lives in `src/paths.rs`
+- Use RESTful methods (GET, POST, DELETE, PATCH, PUT)
+- Path parameters for resource IDs: `/todos/{todo_id}` not in body
+- Handler names: `method_type_resource_[param]_[action]`
 
-### Naming Conventions
-- Improve naming for files, functions, variables, and identifiers
-- Use `snake_case` for URLs (with underscores)
-- HTTP handler names follow the pattern: `method_type_resource_[param]_[action]`
-  - Examples: `post_forms_sign_in`, `delete_actions_todos_todo_id`
-- Module structure mirrors route type structure:
-  - Form handlers in `handlers/forms/`
-  - Action handlers in `handlers/actions/`
-  - Page handlers in `handlers/pages/`
+### Paths
+- **No hardcoded paths** - define all in `src/paths.rs`
+- Single source of truth for URLs
 
-### Configuration Management
-- **All configuration is required** - use `.expect()` with clear error messages
-- **No defaults for environment variables** - if it's needed, it must be set explicitly
-- **Fail fast at startup** - panic immediately if required configuration is missing
-- Store only true constants in `src/constants.rs` (values used in multiple places, not env var defaults)
-- Example: `MAGIC_LINK_EXPIRY_MINUTES` is a constant; `SITE_NAME` is required config, not a default
+### Naming
+- URLs: `snake_case`
+- Handlers: `post_forms_sign_in`, `delete_actions_todos_todo_id`
+- Module structure mirrors route types: `handlers/forms/`, `handlers/actions/`, `handlers/pages/`
+
+### Configuration
+- All config required - use `.expect()` with clear messages
+- No env var defaults - must be set explicitly
+- Fail fast at startup
+- Constants in `src/constants.rs` (not env var defaults)
 
 ---
 
-## Technology-Specific Guidelines
+## Technology Usage
 
-### HTMX Usage
-- Use HTMX to enable RESTful patterns (DELETE, PATCH, PUT) from HTML forms
-- Progressive enhancement: forms should work with or without HTMX when practical
-- Use HTMX for improved UX: partial page updates, optimistic UI, etc.
+### HTMX
+- Enable RESTful patterns (DELETE, PATCH, PUT) from HTML
+- Progressive enhancement when practical
+- Partial updates, optimistic UI
