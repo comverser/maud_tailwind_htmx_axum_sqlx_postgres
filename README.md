@@ -1,15 +1,8 @@
 # Web App Template
 
-A production-ready Rust web application template with authentication, payments, and file processing.
+A minimal, production-ready Rust web application template. Built for developers who want a clean starting point with essential features already implemented: authentication, payments, sessions, and database integration.
 
-## Features
-
-- 🔐 **Passwordless Auth** - Magic link email authentication (15-min expiry)
-- 📧 **Email Services** - Console mode (dev) and SMTP mode (production)
-- 💳 **Payment Processing** - Toss Payments integration with order management
-- 📁 **File Uploads** - Multipart form uploads with text analysis (10MB limit)
-- 🏗️ **Clean Architecture** - Type-first routing, CQRS data layer, centralized paths
-- 🔒 **Security** - CSRF protection, security headers, server-side payment verification
+**Use Case:** Start building your web app immediately without writing boilerplate for auth, payments, or basic CRUD operations.
 
 ## Tech Stack
 
@@ -21,14 +14,24 @@ A production-ready Rust web application template with authentication, payments, 
 ## Quick Start
 
 ```bash
-# 1. Copy and configure environment
-cp .env.example .env
+# 1. Install dependencies
+# Requires: Rust, PostgreSQL, just (cargo install just)
 
-# 2. Run migrations and start server
+# 2. Copy and configure environment
+cp .env.example .env
+# Edit .env with your values (see Configuration below)
+
+# 3. Run migrations and start server
 just
 ```
 
-### Required Environment Variables
+Server starts at `http://127.0.0.1:8000`
+
+## Configuration
+
+All configuration is required - the app will fail fast at startup if any required variable is missing.
+
+### Minimal Setup (Development)
 
 ```bash
 # Server
@@ -36,29 +39,22 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 SERVER_ADDR=127.0.0.1:8000
 SITE_NAME="My App"
 
-# Email
+# Email (console mode - logs to terminal)
 BASE_URL=http://127.0.0.1:8000
-EMAIL_FROM_ADDRESS=your-email@your-domain.com
-EMAIL_FROM_NAME="Support"
-EMAIL_MODE=console  # "smtp" for production
+EMAIL_FROM_ADDRESS=dev@localhost
+EMAIL_FROM_NAME="Dev"
+EMAIL_MODE=console
 
-# Payments (get keys from app.tosspayments.com)
+# Payments (test keys from app.tosspayments.com)
 TOSS_CLIENT_KEY=test_ck_CHANGE_ME
 TOSS_SECRET_KEY=test_sk_CHANGE_ME
 ```
 
-**Note:** Values with spaces must be quoted.
+**Note:** Values with spaces must be quoted in `.env` file.
 
-## Configuration
+### Production Setup
 
-### Email Setup
-
-**Development** (logs to console):
-```bash
-EMAIL_MODE=console
-```
-
-**Production** (requires SMTP):
+**Email (SMTP):**
 ```bash
 EMAIL_MODE=smtp
 SMTP_HOST=smtp.gmail.com
@@ -67,90 +63,146 @@ SMTP_USERNAME=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
 ```
 
-### Payment Setup
-
+**Payments:**
 1. Sign up at [Toss Payments](https://app.tosspayments.com/)
 2. Get API keys from **Settings → API Keys**
-3. Add to `.env`:
-   - `TOSS_CLIENT_KEY` - For browser (SDK)
-   - `TOSS_SECRET_KEY` - For server (API, keep secret)
+3. Replace test keys with live keys in `.env`
+
+## Features
+
+This template includes:
+
+- **Passwordless Authentication** - Magic link email authentication with 15-minute token expiry
+- **Session Management** - PostgreSQL-backed sessions via tower-sessions
+- **Payment Processing** - Full Toss Payments integration with order tracking
+- **File Uploads** - Multipart form handling (10MB limit, text analysis demo)
+- **Email Service** - Dual mode: console logging (dev) or SMTP (production)
+- **CRUD Example** - Todo list demonstrating database operations
+- **Security** - CSRF protection, security headers, server-side payment verification
+
+### Demo Pages
+
+- **Home** - Contact form (sends email)
+- **Sign In** - Magic link authentication
+- **Dashboard** - User orders list
+- **Todos** - Simple CRUD example
+- **Text Analyzer** - File upload → quote → payment → results flow
 
 ## Architecture
 
 ### Type-First Routing
 
-Routes organized by interaction type, not resource:
+This template organizes routes by **interaction type** rather than resource:
 
 ```
-Pages (GET)           Forms (POST)              Actions (POST/DELETE)
-├─ /                  ├─ /forms/sign_in         ├─ /actions/sign_out
-├─ /todos             ├─ /forms/todos           ├─ /actions/todos/{id}
-├─ /sign_in           ├─ /forms/text_analyzer   ├─ /actions/payment/initiate
-├─ /quote/{id}        └─ /forms/contact         └─ /actions/payment/verify
-└─ /checkout/{id}
+GET /pages              POST /forms               POST/DELETE /actions
+├─ /                    ├─ /forms/sign_in         ├─ /actions/sign_out
+├─ /dashboard           ├─ /forms/todos           ├─ /actions/todos/{id}
+├─ /sign_in             ├─ /forms/text_analyzer   ├─ /actions/payment/verify
+├─ /text_analyzer       └─ /forms/contact         └─ ...
+└─ /todos
 ```
 
-**Benefits:** URL shows intent • Clear separation • RESTful within type
+**Why?** URL structure reveals intent. Pages render UI, forms submit data, actions mutate state.
 
 ### Project Structure
 
 ```
 src/
-├── routes/          # Route definitions + middleware
-│   ├── pages.rs     # GET routes
-│   ├── forms.rs     # POST routes (forms)
-│   └── actions.rs   # POST/DELETE/PATCH (mutations)
-├── handlers/        # Request handlers
-├── data/            # Database layer (CQRS)
-│   ├── queries/     # SELECT operations
-│   └── commands/    # INSERT/UPDATE/DELETE
-├── views/           # Maud templates
-├── models/          # Data structures + validation
-├── middlewares/     # Request/response processing
-├── paths.rs         # Centralized URL definitions
-└── config.rs        # Environment configuration
+├── routes/           # Route registration + middleware
+│   ├── pages.rs      # GET routes (render HTML)
+│   ├── forms.rs      # POST routes (form submissions)
+│   └── actions.rs    # POST/DELETE/PATCH (state changes)
+├── handlers/         # Request handlers (business logic)
+│   ├── pages/        # Page handlers
+│   ├── forms/        # Form handlers
+│   └── actions/      # Action handlers
+├── views/            # Maud HTML templates
+│   ├── pages/        # Page templates
+│   ├── layout/       # Shared layouts
+│   └── components/   # Reusable components
+├── data/             # Database layer (CQRS)
+│   ├── queries/      # Read operations (SELECT)
+│   └── commands/     # Write operations (INSERT/UPDATE/DELETE)
+├── models/           # Domain models + validation
+├── middlewares/      # Request/response processing
+├── paths.rs          # ALL URL paths (centralized)
+├── constants.rs      # App-wide constants
+└── config.rs         # Environment configuration
 ```
 
-### Key Patterns
+### Core Patterns
 
-**CQRS Data Layer**
+**1. CQRS Data Layer**
 ```rust
-// Reads
-data::queries::todo::get_todos_by_user(db, user_id)
+// Queries (reads)
+data::queries::order::get_orders_for_user(&db, user_id, limit).await?
 
-// Writes
-data::commands::todo::create_todo(db, user_id, content)
+// Commands (writes)
+data::commands::order::create_order(&db, user_id, filename, ...).await?
 ```
 
-**Centralized Paths**
+**2. Centralized Path Management**
 ```rust
-paths::pages::TODOS           // "/todos"
-paths::with_param(paths::actions::TODOS_TODO_ID, "todo_id", &123)
+// Define once in src/paths.rs
+pub const DASHBOARD: &str = "/dashboard";
+pub const QUOTE: &str = "/quote";
+
+// Use everywhere
+paths::pages::DASHBOARD
+paths::with_param(paths::pages::QUOTE, "order_id", &order_id)
 ```
 
-**Middleware Chain**
+**3. Middleware Chain**
 ```
-Request → Security Headers → HTTP Tracing → Session → Auth → Handler
+Request
+  → Security Headers (CSP, HSTS, etc.)
+  → HTTP Tracing
+  → Session Management
+  → Auth Context Injection
+  → Handler
 ```
 
 ### Design Principles
 
-- **Single Standard** - One way to handle each case
-- **Explicit Over Implicit** - Fail fast with clear errors
-- **No Magic Values** - Constants for all repeated values
-- **Type-First Organization** - Group by interaction type
-- **No Path Hardcoding** - All URLs in `src/paths.rs`
+See `CLAUDE.md` for full development guidelines. Key principles:
 
-## Demo Features
+- **Single Standard Principle** - One consistent way to handle each case
+- **Explicit Over Implicit** - Required config, fail-fast errors, no silent defaults
+- **Keep Code Simple** - Don't abstract until duplication appears
+- **Type-First Organization** - Group by interaction type, not resource
+- **Centralized Constants** - No hardcoded paths, magic values, or scattered config
 
-### Authentication Flow
-User enters email → Receives magic link → Clicks link → Authenticated (15-min token)
+## Development
 
-### Payment Flow
-Upload file → View quote → Checkout → Payment verification → View result
+### Useful Commands
 
-### Contact Form
-User submits inquiry → Email sent to admin (console or SMTP)
+```bash
+just                  # Run migrations + start server
+just migrate          # Run database migrations only
+just reset            # Drop and recreate database
+cargo check           # Check compilation
+cargo test            # Run tests
+```
+
+### Database Migrations
+
+Migrations are in `migrations/` directory. Add new migrations with:
+
+```bash
+# Manual: Create file migrations/YYYYMMDDHHMMSS_description.sql
+# Or use sqlx-cli:
+sqlx migrate add description
+```
+
+### Adding New Features
+
+1. **Add route** in `src/routes/` (pages/forms/actions)
+2. **Add path constant** in `src/paths.rs`
+3. **Create handler** in `src/handlers/`
+4. **Create view** in `src/views/` (if rendering HTML)
+5. **Add queries/commands** in `src/data/` (if touching database)
+6. **Update navigation** in `src/views/layout/navigation.rs` (if needed)
 
 ## License
 
