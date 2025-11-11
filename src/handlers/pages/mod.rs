@@ -1,4 +1,5 @@
 mod checkout;
+mod dashboard;
 mod quote;
 mod result;
 mod root;
@@ -7,6 +8,7 @@ mod text_analyzer;
 mod todos;
 
 pub use checkout::get_checkout;
+pub use dashboard::get_dashboard;
 pub use quote::get_quote;
 pub use result::get_result;
 pub use root::get_root;

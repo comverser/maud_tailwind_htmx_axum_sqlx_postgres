@@ -38,3 +38,22 @@ impl Order {
         }
     }
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OrderSummary {
+    pub order_id: Uuid,
+    pub filename: String,
+    pub file_size: i32,
+    pub text_length: i32,
+    pub price_amount: i32,
+    pub payment_status: PaymentStatus,
+    pub order_number: String,
+    pub created_at: OffsetDateTime,
+}
+
+#[derive(Debug)]
+pub struct OrderStats {
+    pub total_orders: i64,
+    pub total_spent: i64,
+    pub paid_orders_count: i64,
+}

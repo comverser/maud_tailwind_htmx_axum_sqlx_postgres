@@ -25,6 +25,7 @@ macro_rules! define_nested_routes {
 pub mod pages {
     pub const ROOT: &str = "/";
     pub const SIGN_IN: &str = "/sign_in";
+    pub const DASHBOARD: &str = "/dashboard";
     pub const TODOS: &str = "/todos";
     pub const TEXT_ANALYZER: &str = "/text_analyzer";
     pub const QUOTE: &str = "/quote/{order_id}";
