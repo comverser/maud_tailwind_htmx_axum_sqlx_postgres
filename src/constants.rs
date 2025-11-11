@@ -20,4 +20,5 @@ pub mod messages {
     pub const TODO_CREATED: &str = "Todo created successfully";
     pub const EMAIL_SEND_FAILED: &str = "Failed to send email. Please try again.";
     pub const MAGIC_LINK_INVALID: &str = "Invalid or expired magic link. Please request a new one.";
+    pub const CONTACT_SENT: &str = "Thank you for your message! We'll get back to you soon.";
 }

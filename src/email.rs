@@ -125,3 +125,45 @@ pub async fn send_magic_link(
         }
     }
 }
+
+pub async fn send_contact_inquiry(
+    config: &EmailConfig,
+    from_email: &str,
+    message: &str,
+) -> Result<(), EmailError> {
+    let from_mailbox: Mailbox = format!("{} <{}>", config.from_name, config.from_address).parse()?;
+    let to_mailbox: Mailbox = config.from_address.parse()?;
+
+    let email = Message::builder()
+        .from(from_mailbox)
+        .to(to_mailbox)
+        .subject("New Contact Inquiry")
+        .header(ContentType::TEXT_HTML)
+        .body(email_templates::contact_inquiry(from_email, message))?;
+
+    match &config.mode {
+        EmailMode::Console => {
+            tracing::info!("\n\n========== CONTACT INQUIRY EMAIL ==========");
+            tracing::info!("From: {}", from_email);
+            tracing::info!("Message: {}", message);
+            tracing::info!("===========================================\n");
+            Ok(())
+        }
+        EmailMode::Smtp {
+            host,
+            port,
+            username,
+            password,
+        } => {
+            let creds = Credentials::new(username.to_string(), password.to_string());
+            let mailer = SmtpTransport::starttls_relay(host)?
+                .port(*port)
+                .credentials(creds)
+                .build();
+
+            mailer.send(&email)?;
+            tracing::info!("Contact inquiry email sent from {}", from_email);
+            Ok(())
+        }
+    }
+}

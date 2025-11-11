@@ -1,0 +1,75 @@
+use axum::{Extension, Form, extract::State, http::StatusCode, response::{IntoResponse, Response}};
+use sqlx::PgPool;
+use validator::Validate;
+
+use crate::{
+    auth::CurrentUser,
+    config::AppConfig,
+    constants::messages,
+    data::queries,
+    email,
+    flash::FlashMessage,
+    models::contact::{ContactForm, FIELD_EMAIL, FIELD_MESSAGE},
+    paths,
+    views::pages::root,
+};
+use tower_sessions::Session;
+
+use super::parse_validation_errors;
+
+pub async fn post_forms_contact(
+    State(config): State<AppConfig>,
+    State(db): State<PgPool>,
+    Extension(current_user): Extension<CurrentUser>,
+    session: Session,
+    Form(form): Form<ContactForm>,
+) -> Result<Response, crate::handlers::errors::HandlerError> {
+    let email_to_use = match &current_user {
+        CurrentUser::Authenticated { user_id } => {
+            queries::user::get_user_email(&db, *user_id)
+                .await?
+                .unwrap_or(form.email.clone())
+        }
+        CurrentUser::Guest => {
+            if let Err(validation_errors) = form.validate() {
+                return Ok(render_validation_errors(&current_user, config.site_name(), &form, &validation_errors, None));
+            }
+            form.email.clone()
+        }
+    };
+
+    if let Err(e) = email::send_contact_inquiry(config.email(), &email_to_use, &form.message).await {
+        tracing::error!("Failed to send contact inquiry email: {}", e);
+        return Ok(FlashMessage::error(messages::EMAIL_SEND_FAILED)
+            .set_and_redirect(&session, paths::pages::ROOT)
+            .await?);
+    }
+
+    Ok(FlashMessage::success(messages::CONTACT_SENT)
+        .set_and_redirect(&session, paths::pages::ROOT)
+        .await?)
+}
+
+fn render_validation_errors(
+    current_user: &CurrentUser,
+    site_name: &str,
+    form: &ContactForm,
+    validation_errors: &validator::ValidationErrors,
+    user_email: Option<String>,
+) -> Response {
+    let errors = parse_validation_errors(validation_errors);
+    let email_to_show = user_email.as_deref().or(Some(&form.email));
+    (
+        StatusCode::BAD_REQUEST,
+        root::root(
+            current_user,
+            None,
+            site_name,
+            email_to_show,
+            Some(&form.message),
+            errors.get(FIELD_EMAIL).map(String::as_str),
+            errors.get(FIELD_MESSAGE).map(String::as_str),
+        ),
+    )
+        .into_response()
+}

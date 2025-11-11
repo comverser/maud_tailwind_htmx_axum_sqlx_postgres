@@ -32,6 +32,7 @@ pub mod forms {
     define_nested_routes!("/forms", {
         SIGN_IN => "/sign_in",
         TODOS => "/todos",
+        CONTACT => "/contact",
     });
 }
 

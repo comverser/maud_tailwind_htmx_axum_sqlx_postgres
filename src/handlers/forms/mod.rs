@@ -1,6 +1,8 @@
+mod contact;
 mod sign_in;
 mod todo;
 
+pub use contact::post_forms_contact;
 pub use sign_in::post_forms_sign_in;
 pub use todo::post_forms_todos;
 

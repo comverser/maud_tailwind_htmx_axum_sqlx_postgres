@@ -29,3 +29,20 @@ pub fn magic_link_signin(magic_link: &str) -> String {
         MAGIC_LINK_EXPIRY_MINUTES, magic_link, magic_link, magic_link
     )
 }
+
+pub fn contact_inquiry(email: &str, message: &str) -> String {
+    format!(
+        r#"
+        <html>
+            <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2>New Contact Inquiry</h2>
+                <p><strong>From:</strong> {}</p>
+                <div style="margin: 20px 0; padding: 15px; background-color: #f5f5f5; border-radius: 6px;">
+                    <p style="margin: 0; white-space: pre-wrap;">{}</p>
+                </div>
+            </body>
+        </html>
+        "#,
+        email, message
+    )
+}
