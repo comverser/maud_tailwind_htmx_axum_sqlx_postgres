@@ -17,7 +17,6 @@ pub async fn delete_actions_todos_todo_id(
 
     commands::todo::delete_todo(&db, user_id, todo_id).await?;
 
-    // Return empty 200 response for HTMX to remove element from DOM
     Ok(htmx::empty_ok())
 }
 
@@ -28,7 +27,6 @@ pub async fn patch_actions_todos_todo_id_toggle(
 ) -> Result<Response, HandlerError> {
     let user_id = current_user.require_authenticated();
 
-    // Toggle and return updated todo in one query (UPDATE...RETURNING)
     let todo = commands::todo::toggle_todo_returning(&db, user_id, todo_id).await?;
     Ok(htmx::swap_html(todos::todo_item(&todo)))
 }

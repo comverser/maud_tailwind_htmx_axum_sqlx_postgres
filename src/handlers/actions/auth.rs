@@ -37,8 +37,6 @@ pub async fn get_actions_auth_verify(
 
     let user_id = commands::user::get_or_create_user(&db, &email).await?;
 
-    // Flush the session to clear any existing state and create a fresh session.
-    // This ensures the authentication state is properly set in a new session.
     session.flush().await?;
     session.insert(SESSION_USER_ID_KEY, user_id).await?;
 

@@ -80,6 +80,10 @@ impl EmailConfig {
             base_url,
         })
     }
+
+    pub fn base_url(&self) -> &str {
+        &self.base_url
+    }
 }
 
 pub async fn send_magic_link(

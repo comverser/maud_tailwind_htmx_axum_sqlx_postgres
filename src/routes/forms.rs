@@ -10,4 +10,5 @@ pub fn public_form_routes() -> Router<AppState> {
 pub fn protected_form_routes() -> Router<AppState> {
     Router::new()
         .route(relative::TODOS, post(forms::post_forms_todos))
+        .route(relative::TEXT_ANALYZER, post(forms::post_forms_text_analyzer))
 }

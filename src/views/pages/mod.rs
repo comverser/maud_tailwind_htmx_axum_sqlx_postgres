@@ -1,5 +1,9 @@
+pub mod checkout;
 pub mod not_found;
+pub mod quote;
+pub mod result;
 pub mod root;
 pub mod server_error;
 pub mod sign_in;
+pub mod text_analyzer;
 pub mod todos;

@@ -10,4 +10,8 @@ pub fn public_page_routes() -> Router<AppState> {
 pub fn protected_page_routes() -> Router<AppState> {
     Router::new()
         .route(paths::pages::TODOS, get(pages::get_todos))
+        .route(paths::pages::TEXT_ANALYZER, get(pages::get_text_analyzer))
+        .route(paths::pages::QUOTE, get(pages::get_quote))
+        .route(paths::pages::CHECKOUT, get(pages::get_checkout))
+        .route(paths::pages::RESULT, get(pages::get_result))
 }

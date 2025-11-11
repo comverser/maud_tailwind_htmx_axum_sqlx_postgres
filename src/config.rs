@@ -14,11 +14,41 @@ pub enum ConfigError {
 }
 
 #[derive(Clone)]
+pub struct PaymentConfig {
+    toss_client_key: String,
+    toss_secret_key: String,
+}
+
+impl PaymentConfig {
+    pub fn from_env() -> Result<Self, ConfigError> {
+        let toss_client_key = dotenvy::var("TOSS_CLIENT_KEY")
+            .map_err(|_| ConfigError::MissingVar("TOSS_CLIENT_KEY".to_string()))?;
+
+        let toss_secret_key = dotenvy::var("TOSS_SECRET_KEY")
+            .map_err(|_| ConfigError::MissingVar("TOSS_SECRET_KEY".to_string()))?;
+
+        Ok(Self {
+            toss_client_key,
+            toss_secret_key,
+        })
+    }
+
+    pub fn toss_client_key(&self) -> &str {
+        &self.toss_client_key
+    }
+
+    pub fn toss_secret_key(&self) -> &str {
+        &self.toss_secret_key
+    }
+}
+
+#[derive(Clone)]
 pub struct AppConfig {
     server_addr: String,
     database_url: String,
     site_name: String,
     email: EmailConfig,
+    payment: PaymentConfig,
 }
 
 impl AppConfig {
@@ -33,12 +63,14 @@ impl AppConfig {
             .map_err(|_| ConfigError::MissingVar("SITE_NAME".to_string()))?;
 
         let email = EmailConfig::from_env()?;
+        let payment = PaymentConfig::from_env()?;
 
         Ok(Self {
             server_addr,
             database_url,
             site_name,
             email,
+            payment,
         })
     }
 
@@ -56,6 +88,14 @@ impl AppConfig {
 
     pub fn email(&self) -> &EmailConfig {
         &self.email
+    }
+
+    pub fn payment(&self) -> &PaymentConfig {
+        &self.payment
+    }
+
+    pub fn base_url(&self) -> &str {
+        self.email.base_url()
     }
 }
 

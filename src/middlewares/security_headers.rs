@@ -1,6 +1,6 @@
 use axum::{extract::Request, http::{HeaderValue, header}, middleware::Next};
 
-const CSP_POLICY: &str = "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net";
+const CSP_POLICY: &str = "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net https://js.tosspayments.com https://*.tosspayments.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://api.tosspayments.com https://*.tosspayments.com; img-src 'self' data: https://*.tosspayments.com; font-src 'self' https://cdn.jsdelivr.net; frame-src https://api.tosspayments.com https://*.tosspayments.com; form-action 'self' https://*.tosspayments.com";
 
 pub async fn security_headers(req: Request, next: Next) -> axum::response::Response {
     let mut res = next.run(req).await;

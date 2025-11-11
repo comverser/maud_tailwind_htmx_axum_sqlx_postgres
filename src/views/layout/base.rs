@@ -12,18 +12,14 @@ pub fn base_layout(current_user: &CurrentUser, flash: Option<&FlashMessage>, sit
                 title { (title) " - " (site_name) }
                 meta name="description" content=(meta_description);
 
-                // Favicon
                 link rel="icon" type="image/svg+xml" href=(paths::static_files::FAVICON);
 
-                // Tailwind CSS CDN
                 script src=(cdn::TAILWIND_CSS_URL) {}
 
-                // HTMX CDN
                 script src=(cdn::HTMX_URL)
                     integrity=(cdn::HTMX_INTEGRITY)
                     crossorigin="anonymous" {}
 
-                // Hyperscript CDN
                 script src=(cdn::HYPERSCRIPT_URL) {}
             }
             body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col" {

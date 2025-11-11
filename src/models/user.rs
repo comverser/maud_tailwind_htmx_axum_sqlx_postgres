@@ -14,5 +14,5 @@ static EMAIL_RX: LazyLock<Regex> = LazyLock::new(|| {
 #[derive(Deserialize, Validate)]
 pub struct MagicLinkRequestForm {
     #[validate(regex(path = "*EMAIL_RX", message = "Invalid email format"))]
-    pub email: String,  // Must match FIELD_EMAIL constant
+    pub email: String,
 }

@@ -26,6 +26,10 @@ pub mod pages {
     pub const ROOT: &str = "/";
     pub const SIGN_IN: &str = "/sign_in";
     pub const TODOS: &str = "/todos";
+    pub const TEXT_ANALYZER: &str = "/text_analyzer";
+    pub const QUOTE: &str = "/quote/{order_id}";
+    pub const CHECKOUT: &str = "/checkout/{order_id}";
+    pub const RESULT: &str = "/result/{order_id}";
 }
 
 pub mod forms {
@@ -33,6 +37,7 @@ pub mod forms {
         SIGN_IN => "/sign_in",
         TODOS => "/todos",
         CONTACT => "/contact",
+        TEXT_ANALYZER => "/text_analyzer",
     });
 }
 
@@ -42,6 +47,8 @@ pub mod actions {
         VERIFY_MAGIC_LINK => "/auth/verify",
         TODOS_TODO_ID => "/todos/{todo_id}",
         TODOS_TODO_ID_TOGGLE => "/todos/{todo_id}/toggle",
+        PAYMENT_INITIATE => "/payment/initiate",
+        PAYMENT_VERIFY => "/payment/verify",
     });
 }
 
