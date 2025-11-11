@@ -51,33 +51,13 @@ Write comments only when they are truly important and likely to remain accurate.
 - **When in doubt, skip it** - Code should be self-documenting through clear naming; only add comments for non-obvious decisions
 
 ### Essential Elements Only
-Keep UI minimal with zero decorative elements - function over form.
+UI must be minimal and functional - no decoration.
 
-- **No decorative styling** - No shadows, rounded corners, background colors, or font weights unless functionally necessary
-- **Maximum information density** - Tight spacing, compact layouts, no wasted space
-- **Brutalist approach** - Simple borders for separation, flat design, monochrome where possible
-- **Functional states only** - Hover states for interactivity, focus states for accessibility, no animations or transitions
-- **Consistent indigo accent** - Single primary color (indigo-600) for buttons and links
-- **Typography simplicity** - Single font weight, minimal size variations (text-xl for h1, text-sm for labels)
-- **Border-based focus** - Simple border color change instead of focus rings
-- **No card wrappers** - Content flows directly without container backgrounds
-
-**What to avoid:**
-- Shadows (`shadow-md`, `shadow-lg`)
-- Rounded corners (`rounded-lg`, `rounded-md`)
-- Font weights (`font-semibold`, `font-bold`, `font-medium`)
-- Background colors for decoration (`bg-gray-50`, `bg-white` containers)
-- Focus rings (`focus:ring-2`)
-- Transitions and animations (`transition-colors`)
-- Large padding (`p-6`, `py-4` unless needed for touch targets)
-- Colored backgrounds for status (`bg-green-50`, `bg-red-50`)
-
-**What to keep:**
-- Essential borders for separation
-- Hover states for buttons and links
-- Border color changes for focus (accessibility)
-- Minimal padding for usability (py-2 px-3 for buttons, py-2 for table cells)
-- Text colors for meaning (green-700 success, red-700 error, indigo-600 primary)
+- No shadows, rounded corners, font weights, or decorative backgrounds
+- Simple borders for separation only
+- Single primary color (indigo-600)
+- Hover for interaction, border change for focus
+- Tight spacing, maximum information density
 
 ### Other Principles
 - Follow modern Rust conventions
