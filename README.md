@@ -170,6 +170,7 @@ See `CLAUDE.md` for full development guidelines. Key principles:
 - **Single Standard Principle** - One consistent way to handle each case
 - **Explicit Over Implicit** - Required config, fail-fast errors, no silent defaults
 - **Keep Code Simple** - Don't abstract until duplication appears
+- **Essential Elements Only** - Minimal UI with no decoration (no shadows, rounded corners, font weights)
 - **Type-First Organization** - Group by interaction type, not resource
 - **Centralized Constants** - No hardcoded paths, magic values, or scattered config
 
