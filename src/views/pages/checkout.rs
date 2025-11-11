@@ -53,22 +53,18 @@ pub fn checkout(
                     const tossPayments = TossPayments('{}');
                     button.disabled = false;
 
-                    button.addEventListener('click', function() {{
-                        console.log('Payment request parameters:', {{
-                            amount: {},
-                            orderId: '{}',
-                            orderName: '{} - {}',
-                            successUrl: window.location.origin + '{}',
-                            failUrl: window.location.origin + '{}'
-                        }});
+                    const paymentParams = {{
+                        amount: {},
+                        orderId: '{}',
+                        orderName: '{} - {}',
+                        successUrl: window.location.origin + '{}',
+                        failUrl: window.location.origin + '{}'
+                    }};
 
-                        tossPayments.requestPayment('카드', {{
-                            amount: {},
-                            orderId: '{}',
-                            orderName: '{} - {}',
-                            successUrl: window.location.origin + '{}',
-                            failUrl: window.location.origin + '{}'
-                        }})
+                    button.addEventListener('click', function() {{
+                        console.log('Payment request parameters:', paymentParams);
+
+                        tossPayments.requestPayment('카드', paymentParams)
                         .catch(function(error) {{
                             console.error('Payment request failed:', error);
                             alert('결제 요청 실패: ' + (error.message || error.code));
@@ -81,12 +77,6 @@ pub fn checkout(
                 }}
             "#,
                 client_key,
-                order.price_amount,
-                order.order_number,
-                payment::ORDER_NAME_PREFIX,
-                order.filename,
-                success_url,
-                fail_url,
                 order.price_amount,
                 order.order_number,
                 payment::ORDER_NAME_PREFIX,

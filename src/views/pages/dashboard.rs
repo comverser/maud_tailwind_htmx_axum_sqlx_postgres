@@ -1,12 +1,12 @@
 use crate::{
     auth::CurrentUser,
     flash::FlashMessage,
+    formatting,
     models::order::OrderSummary,
     paths,
     views::layout::base::base_layout,
 };
 use maud::{html, Markup};
-use time::format_description::well_known::Rfc3339;
 
 pub fn dashboard(
     current_user: &CurrentUser,
@@ -48,18 +48,7 @@ pub fn dashboard(
 fn order_row(order: &OrderSummary) -> Markup {
     let status_class = order.payment_status.css_class();
     let status_text = order.payment_status.display_text();
-
-    let formatted_date = order.created_at
-        .format(&Rfc3339)
-        .unwrap_or_else(|_| String::from("Invalid date"));
-    let datetime_parts: Vec<&str> = formatted_date.split('T').collect();
-    let date_part = datetime_parts.first().unwrap_or(&"");
-    let time_part = datetime_parts.get(1).and_then(|t| t.split('.').next()).unwrap_or("");
-    let date_display = if !time_part.is_empty() {
-        format!("{} {}", date_part, time_part)
-    } else {
-        date_part.to_string()
-    };
+    let date_display = formatting::format_datetime(order.created_at);
 
     html! {
         tr class="border-b" {

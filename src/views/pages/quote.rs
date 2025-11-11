@@ -19,7 +19,16 @@ pub fn quote(
                     }
                     div class="flex justify-between" {
                         span class="text-gray-600" { "Size" }
-                        span { (format_file_size(order.file_size)) }
+                        span {
+                            @let bytes = order.file_size as f64;
+                            @if bytes < 1024.0 {
+                                (format!("{} B", bytes))
+                            } @else if bytes < 1024.0 * 1024.0 {
+                                (format!("{:.2} KB", bytes / 1024.0))
+                            } @else {
+                                (format!("{:.2} MB", bytes / (1024.0 * 1024.0)))
+                            }
+                        }
                     }
                     div class="flex justify-between" {
                         span class="text-gray-600" { "Characters" }
@@ -46,15 +55,4 @@ pub fn quote(
     };
 
     base_layout(current_user, flash, site_name, "Quote", "Review your quote", content)
-}
-
-fn format_file_size(bytes: i32) -> String {
-    let bytes = bytes as f64;
-    if bytes < 1024.0 {
-        format!("{} B", bytes)
-    } else if bytes < 1024.0 * 1024.0 {
-        format!("{:.2} KB", bytes / 1024.0)
-    } else {
-        format!("{:.2} MB", bytes / (1024.0 * 1024.0))
-    }
 }

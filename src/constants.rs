@@ -50,3 +50,7 @@ pub mod payment {
 pub mod file_upload {
     pub const MAX_FILE_SIZE: usize = 10 * 1024 * 1024; // 10MB
 }
+
+pub mod logging {
+    pub const UNKNOWN_CLIENT_IP: &str = "unknown";
+}

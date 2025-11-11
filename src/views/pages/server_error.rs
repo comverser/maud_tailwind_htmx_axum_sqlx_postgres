@@ -3,7 +3,7 @@ use maud::{Markup, html};
 
 pub fn server_error(current_user: &CurrentUser, flash: Option<&FlashMessage>, site_name: &str, message: &str) -> Markup {
     let content = html! {
-        h1 class="text-6xl font-bold text-gray-900 mb-4" { "500" }
+        h1 class="text-6xl mb-3" { "500" }
         p class="text-red-600" { (message) }
     };
 

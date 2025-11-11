@@ -25,10 +25,10 @@ impl PaymentStatus {
 
     pub fn css_class(&self) -> &'static str {
         match self {
-            Self::Paid => "text-green-600 bg-green-50",
-            Self::Pending => "text-yellow-600 bg-yellow-50",
-            Self::Failed => "text-red-600 bg-red-50",
-            Self::Cancelled => "text-gray-600 bg-gray-50",
+            Self::Paid => "text-green-600",
+            Self::Pending => "text-yellow-600",
+            Self::Failed => "text-red-600",
+            Self::Cancelled => "text-gray-600",
         }
     }
 }

@@ -22,7 +22,7 @@ pub fn base_layout(current_user: &CurrentUser, flash: Option<&FlashMessage>, sit
 
                 script src=(cdn::HYPERSCRIPT_URL) {}
             }
-            body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col" {
+            body class="min-h-screen flex flex-col" {
                 (navigation::navbar(current_user))
                 main class="flex-grow container mx-auto px-4 py-8" {
                     (components::flash::flash(flash))

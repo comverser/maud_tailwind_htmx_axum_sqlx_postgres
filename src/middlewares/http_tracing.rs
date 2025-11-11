@@ -8,6 +8,8 @@ use tower_http::{
 };
 use tracing::Span;
 
+use crate::constants::logging;
+
 type HttpTraceLayer = ServiceBuilder<
     Stack<
         TraceLayer<
@@ -38,7 +40,7 @@ fn on_request(request: &Request<Body>, _: &Span) {
         .extensions()
         .get::<ConnectInfo<std::net::SocketAddr>>()
         .map(|ConnectInfo(addr)| addr.ip().to_string())
-        .unwrap_or("unknown".to_string());
+        .unwrap_or(logging::UNKNOWN_CLIENT_IP.to_string());
 
     tracing::info!(
         "-> Request started: client {} method {} path {}",
