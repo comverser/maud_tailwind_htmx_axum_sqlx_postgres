@@ -1,7 +1,7 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::{constants::errors, data::errors::DataError, models::order::{Order, OrderStats, OrderSummary}};
+use crate::{constants::errors, data::errors::DataError, models::order::{Order, OrderSummary}};
 
 pub async fn get_order(db: &PgPool, order_id: Uuid) -> Result<Option<Order>, DataError> {
     let order = sqlx::query_as!(
@@ -88,31 +88,6 @@ pub async fn get_orders_for_user(
     .await?;
 
     Ok(orders)
-}
-
-pub async fn get_order_stats_for_user(
-    db: &PgPool,
-    user_id: i32,
-) -> Result<OrderStats, DataError> {
-    let result = sqlx::query!(
-        r#"
-        SELECT
-            COUNT(*) as "total_orders!",
-            COALESCE(SUM(CASE WHEN payment_status = 'paid' THEN price_amount ELSE 0 END), 0) as "total_spent!",
-            COUNT(CASE WHEN payment_status = 'paid' THEN 1 END) as "paid_orders_count!"
-        FROM orders
-        WHERE user_id = $1
-        "#,
-        user_id
-    )
-    .fetch_one(db)
-    .await?;
-
-    Ok(OrderStats {
-        total_orders: result.total_orders,
-        total_spent: result.total_spent,
-        paid_orders_count: result.paid_orders_count,
-    })
 }
 
 pub async fn get_order_for_user(

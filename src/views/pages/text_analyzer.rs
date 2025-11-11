@@ -8,14 +8,13 @@ pub fn text_analyzer(
 ) -> Markup {
     let content = html! {
         div class="max-w-lg mx-auto" {
-            h1 class="text-3xl font-bold text-gray-900 mb-2" { "Text Analyzer" }
-            p class="text-sm text-gray-600 mb-6" { "Upload a text file for analysis (₩1 per character)" }
+            h1 class="text-2xl font-bold text-gray-900 mb-4" { "Text Analyzer" }
 
             div class="bg-white rounded-lg shadow-md p-6" {
                 form method="post" action=(paths::forms::TEXT_ANALYZER) enctype="multipart/form-data" class="space-y-4" {
                     div {
                         label for="file" class="block text-sm font-medium text-gray-700 mb-2" {
-                            "Text File (.txt, max 10MB)"
+                            "Text File"
                         }
                         input
                             type="file"

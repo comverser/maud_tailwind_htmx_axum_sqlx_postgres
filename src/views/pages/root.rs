@@ -12,10 +12,8 @@ pub fn root(
 ) -> Markup {
     let content = html! {
         div class="max-w-2xl mx-auto" {
-            h1 class="text-5xl font-bold text-gray-900 mb-8" { "Welcome" }
-
             div class="bg-white rounded-lg shadow-md p-6" {
-                h2 class="text-2xl font-semibold text-gray-900 mb-4" { "Contact Us" }
+                h1 class="text-2xl font-semibold text-gray-900 mb-4" { "Contact" }
 
                 form method="post" action=(paths::forms::CONTACT) class="space-y-4" {
                     @match current_user {
