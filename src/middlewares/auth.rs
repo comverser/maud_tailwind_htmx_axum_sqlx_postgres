@@ -6,7 +6,7 @@ use axum::{
 };
 use tower_sessions::Session;
 
-use crate::{auth::CurrentUser, flash::FlashMessage, paths};
+use crate::{auth::CurrentUser, constants::messages, flash::FlashMessage, paths};
 
 pub async fn require_authentication(req: Request, next: Next) -> axum::response::Response {
     match req.extensions().get::<CurrentUser>() {
@@ -21,7 +21,7 @@ pub async fn require_authentication(req: Request, next: Next) -> axum::response:
         _ => {
             let session = req.extensions().get::<Session>().cloned();
             if let Some(session) = session
-                && let Err(e) = FlashMessage::error("Please sign in to continue")
+                && let Err(e) = FlashMessage::error(messages::SIGN_IN_REQUIRED)
                     .set(&session)
                     .await
             {

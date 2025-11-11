@@ -6,7 +6,7 @@ use uuid::Uuid;
 use crate::{
     auth::CurrentUser,
     config::AppConfig,
-    constants::messages,
+    constants::{errors, messages},
     data::{commands, errors::DataError, queries},
     flash::FlashMessage,
     models::order::PaymentStatus,
@@ -29,14 +29,12 @@ pub async fn post_actions_payment_initiate(
 
     let order = queries::order::get_order(&db, form.order_id)
         .await?
-        .ok_or(DataError::NotFound("Order not found"))?;
+        .ok_or(DataError::NotFound(errors::ORDER_NOT_FOUND))?;
 
-    if order.user_id != user_id {
-        return Err(DataError::Unauthorized("Not your order").into());
-    }
+    order.verify_ownership(user_id)?;
 
     if !matches!(order.payment_status, PaymentStatus::Pending) {
-        return Ok(FlashMessage::error("Order already processed")
+        return Ok(FlashMessage::error(messages::ORDER_ALREADY_PROCESSED)
             .set_and_redirect(&session, &paths::with_param(paths::pages::QUOTE, "order_id", &order.order_id))
             .await?);
     }
@@ -74,11 +72,9 @@ pub async fn get_actions_payment_verify(
 
     let order = queries::order::get_order_by_order_number(&db, &query.order_id)
         .await?
-        .ok_or(DataError::NotFound("Order not found"))?;
+        .ok_or(DataError::NotFound(errors::ORDER_NOT_FOUND))?;
 
-    if order.user_id != user_id {
-        return Err(DataError::Unauthorized("Not your order").into());
-    }
+    order.verify_ownership(user_id)?;
 
     if query.amount != order.price_amount {
         tracing::error!("Payment amount mismatch: expected {}, got {}", order.price_amount, query.amount);
@@ -97,7 +93,7 @@ pub async fn get_actions_payment_verify(
 
     let client = reqwest::Client::new();
     let response = client
-        .post("https://api.tosspayments.com/v1/payments/confirm")
+        .post(crate::constants::payment::TOSS_API_CONFIRM_URL)
         .basic_auth(&secret_key, Some(""))
         .json(&confirm_request)
         .send()
@@ -117,7 +113,7 @@ pub async fn get_actions_payment_verify(
                 .await?)
         }
         Ok(resp) => {
-            let error_body = resp.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+            let error_body = resp.text().await.unwrap_or("Unknown error".to_string());
             tracing::error!("Toss payment confirmation failed: {}", error_body);
 
             commands::order::update_order_payment(

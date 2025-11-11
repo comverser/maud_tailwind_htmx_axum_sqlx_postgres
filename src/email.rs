@@ -84,6 +84,19 @@ impl EmailConfig {
     pub fn base_url(&self) -> &str {
         &self.base_url
     }
+
+    fn create_smtp_transport(&self) -> Result<SmtpTransport, EmailError> {
+        match &self.mode {
+            EmailMode::Smtp { host, port, username, password } => {
+                let creds = Credentials::new(username.clone(), password.clone());
+                Ok(SmtpTransport::starttls_relay(host)?
+                    .port(*port)
+                    .credentials(creds)
+                    .build())
+            }
+            EmailMode::Console => unreachable!("Console mode doesn't need SMTP transport"),
+        }
+    }
 }
 
 pub async fn send_magic_link(
@@ -111,18 +124,8 @@ pub async fn send_magic_link(
             tracing::info!("======================================\n");
             Ok(())
         }
-        EmailMode::Smtp {
-            host,
-            port,
-            username,
-            password,
-        } => {
-            let creds = Credentials::new(username.to_string(), password.to_string());
-            let mailer = SmtpTransport::starttls_relay(host)?
-                .port(*port)
-                .credentials(creds)
-                .build();
-
+        EmailMode::Smtp { .. } => {
+            let mailer = config.create_smtp_transport()?;
             mailer.send(&email)?;
             tracing::info!("Magic link email sent to {}", to_email);
             Ok(())
@@ -153,18 +156,8 @@ pub async fn send_contact_inquiry(
             tracing::info!("===========================================\n");
             Ok(())
         }
-        EmailMode::Smtp {
-            host,
-            port,
-            username,
-            password,
-        } => {
-            let creds = Credentials::new(username.to_string(), password.to_string());
-            let mailer = SmtpTransport::starttls_relay(host)?
-                .port(*port)
-                .credentials(creds)
-                .build();
-
+        EmailMode::Smtp { .. } => {
+            let mailer = config.create_smtp_transport()?;
             mailer.send(&email)?;
             tracing::info!("Contact inquiry email sent from {}", from_email);
             Ok(())

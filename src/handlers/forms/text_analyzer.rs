@@ -3,7 +3,7 @@ use sqlx::PgPool;
 
 use crate::{
     auth::CurrentUser,
-    constants::{file_upload, pricing},
+    constants::{errors, file_upload, pricing},
     data::{commands, errors::DataError},
     flash::FlashMessage,
     paths,
@@ -50,9 +50,9 @@ pub async fn post_forms_text_analyzer(
         }
     }
 
-    let filename = filename.ok_or(DataError::NotFound("No file provided"))?;
-    let file_size = file_size.ok_or(DataError::NotFound("No file provided"))? as i32;
-    let text_content = text_content.ok_or(DataError::NotFound("No file content"))?;
+    let filename = filename.ok_or(DataError::NotFound(errors::NO_FILE_PROVIDED))?;
+    let file_size = file_size.ok_or(DataError::NotFound(errors::NO_FILE_PROVIDED))? as i32;
+    let text_content = text_content.ok_or(DataError::NotFound(errors::NO_FILE_CONTENT))?;
 
     let text_length = text_content.chars().count() as i32;
     let calculated_price = text_length * pricing::PRICE_PER_CHARACTER;

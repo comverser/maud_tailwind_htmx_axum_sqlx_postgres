@@ -17,6 +17,7 @@ mod middlewares;
 mod models;
 mod paths;
 mod routes;
+mod validation;
 mod views;
 
 use config::{AppConfig, AppState};

@@ -38,7 +38,7 @@ fn on_request(request: &Request<Body>, _: &Span) {
         .extensions()
         .get::<ConnectInfo<std::net::SocketAddr>>()
         .map(|ConnectInfo(addr)| addr.ip().to_string())
-        .unwrap_or_else(|| "unknown".to_string());
+        .unwrap_or("unknown".to_string());
 
     tracing::info!(
         "-> Request started: client {} method {} path {}",

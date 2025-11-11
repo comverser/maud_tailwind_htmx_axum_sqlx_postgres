@@ -2,7 +2,7 @@ use axum::{Extension, extract::{Path, State}};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::{auth::CurrentUser, config::AppConfig, data::{errors::DataError, queries}, flash::FlashMessage, handlers::errors::HandlerError, views::pages};
+use crate::{auth::CurrentUser, config::AppConfig, constants::errors, data::{errors::DataError, queries}, flash::FlashMessage, handlers::errors::HandlerError, views::pages};
 use maud::Markup;
 
 pub async fn get_quote(
@@ -16,11 +16,9 @@ pub async fn get_quote(
 
     let order = queries::order::get_order(&db, order_id)
         .await?
-        .ok_or(DataError::NotFound("Order not found"))?;
+        .ok_or(DataError::NotFound(errors::ORDER_NOT_FOUND))?;
 
-    if order.user_id != user_id {
-        return Err(DataError::Unauthorized("Not your order").into());
-    }
+    order.verify_ownership(user_id)?;
 
     Ok(pages::quote::quote(&current_user, flash.as_ref(), config.site_name(), &order))
 }

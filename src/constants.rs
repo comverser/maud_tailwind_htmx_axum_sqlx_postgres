@@ -25,11 +25,25 @@ pub mod messages {
     pub const CONTACT_SENT: &str = "Thank you for your message! We'll get back to you soon.";
     pub const PAYMENT_SUCCESS: &str = "Payment successful! Your order is complete.";
     pub const PAYMENT_FAILED: &str = "Payment failed. Please try again.";
+    pub const SIGN_IN_REQUIRED: &str = "Please sign in to continue";
+    pub const ORDER_ALREADY_PROCESSED: &str = "Order already processed";
+}
+
+pub mod errors {
+    pub const ORDER_NOT_FOUND: &str = "Order not found";
+    pub const PAYMENT_NOT_COMPLETED: &str = "Payment not completed";
+    pub const NOT_YOUR_ORDER: &str = "Not your order";
+    pub const NO_FILE_PROVIDED: &str = "No file provided";
+    pub const NO_FILE_CONTENT: &str = "No file content";
 }
 
 pub mod pricing {
     pub const PRICE_PER_CHARACTER: i32 = 1;
     pub const MINIMUM_ORDER_AMOUNT: i32 = 100;
+}
+
+pub mod payment {
+    pub const TOSS_API_CONFIRM_URL: &str = "https://api.tosspayments.com/v1/payments/confirm";
 }
 
 pub mod file_upload {

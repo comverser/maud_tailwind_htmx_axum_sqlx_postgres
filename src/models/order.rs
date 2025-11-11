@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use uuid::Uuid;
 
+use crate::{constants::errors, data::errors::DataError};
+
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::Type)]
 #[sqlx(type_name = "text", rename_all = "lowercase")]
 pub enum PaymentStatus {
@@ -25,4 +27,14 @@ pub struct Order {
     pub order_number: String,
     pub created_at: OffsetDateTime,
     pub paid_at: Option<OffsetDateTime>,
+}
+
+impl Order {
+    pub fn verify_ownership(&self, user_id: i32) -> Result<(), DataError> {
+        if self.user_id != user_id {
+            Err(DataError::Unauthorized(errors::NOT_YOUR_ORDER))
+        } else {
+            Ok(())
+        }
+    }
 }
