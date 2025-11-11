@@ -1,119 +1,64 @@
 # Web App Template
 
-A minimal web application template built with Rust featuring authentication, file uploads, and payment processing.
+A production-ready Rust web application template with authentication, payments, and file processing.
+
+## Features
+
+- 🔐 **Passwordless Auth** - Magic link email authentication (15-min expiry)
+- 📧 **Email Services** - Console mode (dev) and SMTP mode (production)
+- 💳 **Payment Processing** - Toss Payments integration with order management
+- 📁 **File Uploads** - Multipart form uploads with text analysis (10MB limit)
+- 🏗️ **Clean Architecture** - Type-first routing, CQRS data layer, centralized paths
+- 🔒 **Security** - CSRF protection, security headers, server-side payment verification
 
 ## Tech Stack
 
-- **Backend**: Axum
-- **Database**: PostgreSQL with SQLx
-- **Templates**: Maud
-- **Frontend**: HTMX + Tailwind CSS
-- **Sessions**: tower-sessions with PostgreSQL store
-- **Authentication**: Magic Link (passwordless)
-- **Payments**: Toss Payments integration
+**Backend:** Axum • PostgreSQL + SQLx • Maud templates
+**Frontend:** HTMX • Tailwind CSS
+**Auth:** Magic links • tower-sessions
+**Payments:** Toss Payments
 
-## Key Features
-
-### 🔐 Passwordless Authentication
-Magic link authentication system that eliminates password management:
-- Email-based sign-in (no passwords to remember)
-- Secure token generation with 15-minute expiry
-- Automatic user account creation
-- Session management with PostgreSQL store
-
-### 📧 Email Services
-Flexible email system supporting both development and production:
-- **Console mode** for development (logs emails to terminal)
-- **SMTP mode** for production (supports any SMTP provider)
-- Magic link delivery for authentication
-- Contact form with inquiry submissions to admin
-
-### 💳 Payment Processing
-Complete payment integration with Toss Payments:
-- File upload and text analysis demo workflow
-- Dynamic pricing calculation (per-character with minimum amount)
-- Secure server-side payment verification
-- Order tracking with payment status management
-- Payment success/failure handling with user feedback
-
-### 📁 File Upload & Analysis
-File processing demonstration feature:
-- Multipart form file uploads (up to 10MB)
-- UTF-8 text content extraction and analysis
-- Character count and price calculation
-- File metadata storage (filename, size, content)
-- Order generation with unique order numbers
-
-### 🏗️ Production-Ready Architecture
-Clean, maintainable codebase following best practices:
-- Type-first routing (pages/forms/actions separation)
-- CQRS pattern for database operations
-- Centralized path management (no hardcoded URLs)
-- Security headers and CSRF protection
-- Comprehensive error handling
-- Structured logging with tracing
-
-## Getting Started
-
-### 1. Set up PostgreSQL database
-
-Ensure PostgreSQL is running on your system.
-
-### 2. Configure environment variables
-
-Copy `.env.example` to `.env` and configure:
+## Quick Start
 
 ```bash
+# 1. Copy and configure environment
 cp .env.example .env
+
+# 2. Run migrations and start server
+just
 ```
 
-All configuration variables are required:
+### Required Environment Variables
 
 ```bash
-# Server Configuration
+# Server
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 SERVER_ADDR=127.0.0.1:8000
 SITE_NAME="My App"
 
-# Email Configuration
+# Email
 BASE_URL=http://127.0.0.1:8000
 EMAIL_FROM_ADDRESS=noreply@example.com
 EMAIL_FROM_NAME="My App"
-EMAIL_MODE=console  # or "smtp" for production
+EMAIL_MODE=console  # "smtp" for production
 
-# Toss Payments Configuration
+# Payments (get keys from app.tosspayments.com)
 TOSS_CLIENT_KEY=test_ck_CHANGE_ME
 TOSS_SECRET_KEY=test_sk_CHANGE_ME
 ```
 
-**Note**: Values with spaces must be quoted (e.g., `SITE_NAME="My App"`).
+**Note:** Values with spaces must be quoted.
 
-### 3. Run migrations and start
+## Configuration
 
-```bash
-just
-```
+### Email Setup
 
-## Magic Link Authentication
-
-This template uses passwordless authentication via magic links. Users simply enter their email address and receive a link to sign in - no passwords required!
-
-### How It Works
-
-1. User enters their email on the sign-in page
-2. System generates a secure token and sends an email with a magic link
-3. User clicks the link to authenticate (valid for 15 minutes)
-4. System creates or retrieves user account and establishes a session
-
-### Email Modes
-
-**Development Mode** (logs magic links to console):
+**Development** (logs to console):
 ```bash
 EMAIL_MODE=console
 ```
-Magic links appear in terminal output - no SMTP configuration needed.
 
-**Production Mode** (sends real emails):
+**Production** (requires SMTP):
 ```bash
 EMAIL_MODE=smtp
 SMTP_HOST=smtp.gmail.com
@@ -121,170 +66,92 @@ SMTP_PORT=587
 SMTP_USERNAME=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
 ```
-Works with any SMTP provider (Gmail, SendGrid, AWS SES, etc.).
 
-## Payment Integration
-
-This template includes a complete payment flow using Toss Payments, demonstrating how to integrate payment processing in a Rust web application.
-
-### Text Analyzer Demo Feature
-
-The template includes a text analyzer feature that demonstrates the full payment workflow:
-
-1. **File Upload** - User uploads a text file (up to 10MB)
-2. **Quote Generation** - System analyzes the file and generates a price quote
-3. **Payment Checkout** - User proceeds to Toss Payments checkout
-4. **Payment Verification** - Server validates payment with Toss API
-5. **Result Display** - Successful payment shows the result page
-
-### Payment Flow Architecture
-
-```
-POST /forms/text_analyzer    → Upload file, create order
-  ↓
-GET /quote/{order_id}        → View quote with payment button
-  ↓
-POST /actions/payment/initiate → Verify order status
-  ↓
-GET /checkout/{order_id}     → Toss Payments SDK checkout page
-  ↓
-GET /actions/payment/verify  → Verify payment with Toss API
-  ↓
-GET /result/{order_id}       → Display completed order
-```
-
-### Toss Payments Setup
+### Payment Setup
 
 1. Sign up at [Toss Payments](https://app.tosspayments.com/)
-2. Navigate to **Settings → API Keys**
-3. Copy your test keys:
-   - **Client Key**: Used in the browser (SDK)
-   - **Secret Key**: Used on the server (API calls)
-4. Add keys to `.env`:
-   ```bash
-   TOSS_CLIENT_KEY=test_ck_your_key_here
-   TOSS_SECRET_KEY=test_sk_your_key_here
-   ```
+2. Get API keys from **Settings → API Keys**
+3. Add to `.env`:
+   - `TOSS_CLIENT_KEY` - For browser (SDK)
+   - `TOSS_SECRET_KEY` - For server (API, keep secret)
 
-**Security Notes:**
-- Client key is safe to expose in HTML (used by Toss SDK)
-- Secret key must never be exposed to the browser
-- Payment confirmation happens server-side for security
-- All payment amounts are verified before processing
+## Architecture
 
-## Core Structure
+### Type-First Routing
 
-This template follows a **type-first routing architecture** that organizes code by interaction type rather than by resource. This makes the application's behavior immediately clear from its URL structure.
-
-### Route Organization
-
-Routes are grouped by **what they do**, not **what they operate on**:
+Routes organized by interaction type, not resource:
 
 ```
-GET  /                          → Render homepage
-GET  /todos                     → Render todos page
-GET  /sign_in                   → Render sign-in page
-GET  /quote/{order_id}          → Render quote page
-GET  /checkout/{order_id}       → Render checkout page
-GET  /result/{order_id}         → Render result page
-
-POST /forms/sign_in             → Process sign-in form
-POST /forms/todos               → Process new todo form
-POST /forms/text_analyzer       → Process file upload
-
-POST   /actions/sign_out        → Sign out action
-DELETE /actions/todos/{id}      → Delete todo action
-POST   /actions/todos/{id}/toggle → Toggle todo action
-POST   /actions/payment/initiate  → Initiate payment
-GET    /actions/payment/verify    → Verify payment callback
+Pages (GET)           Forms (POST)              Actions (POST/DELETE)
+├─ /                  ├─ /forms/sign_in         ├─ /actions/sign_out
+├─ /todos             ├─ /forms/todos           ├─ /actions/todos/{id}
+├─ /sign_in           ├─ /forms/text_analyzer   ├─ /actions/payment/initiate
+├─ /quote/{id}        └─ /forms/contact         └─ /actions/payment/verify
+└─ /checkout/{id}
 ```
 
-**Why this pattern?**
-- URL immediately tells you the interaction type (viewing, submitting form, or state change)
-- Clear separation between reads (pages), form submissions (forms), and mutations (actions)
-- RESTful HTTP methods (GET, POST, DELETE, PATCH) within each type
+**Benefits:** URL shows intent • Clear separation • RESTful within type
 
-### Layer Architecture
-
-The codebase is organized into clear layers with distinct responsibilities:
+### Project Structure
 
 ```
 src/
-├── routes/          # Route definitions & middleware configuration
-│   ├── pages.rs     # GET-only routes (viewing)
-│   ├── forms.rs     # POST routes (form submissions)
-│   └── actions.rs   # POST/DELETE/PATCH routes (state changes)
-│
-├── handlers/        # Request handlers (one per route)
-│   ├── pages/       # Render views
-│   ├── forms/       # Process & validate form data
-│   └── actions/     # Execute state-changing operations
-│
-├── data/            # Database access layer (CQRS pattern)
-│   ├── queries/     # Read operations (SELECT)
-│   └── commands/    # Write operations (INSERT, UPDATE, DELETE)
-│
-├── views/           # HTML templates (Maud)
-│   ├── layout/      # Base structure & navigation
-│   ├── components/  # Reusable UI elements
-│   └── pages/       # Full page templates
-│
+├── routes/          # Route definitions + middleware
+│   ├── pages.rs     # GET routes
+│   ├── forms.rs     # POST routes (forms)
+│   └── actions.rs   # POST/DELETE/PATCH (mutations)
+├── handlers/        # Request handlers
+├── data/            # Database layer (CQRS)
+│   ├── queries/     # SELECT operations
+│   └── commands/    # INSERT/UPDATE/DELETE
+├── views/           # Maud templates
+├── models/          # Data structures + validation
 ├── middlewares/     # Request/response processing
-│   ├── session.rs   # Load user from session
-│   ├── auth.rs      # Require authentication
-│   └── ...
-│
-├── models/          # Data structures & validation
-├── paths.rs         # Single source of truth for all URLs
-└── config.rs        # Application configuration
+├── paths.rs         # Centralized URL definitions
+└── config.rs        # Environment configuration
 ```
 
-### Key Architectural Patterns
+### Key Patterns
 
-**1. CQRS Data Layer**
+**CQRS Data Layer**
 ```rust
-// Queries - read operations
+// Reads
 data::queries::todo::get_todos_by_user(db, user_id)
 
-// Commands - write operations
+// Writes
 data::commands::todo::create_todo(db, user_id, content)
 ```
-Separates reads from writes for clearer intent and better organization.
 
-**2. Middleware Chain**
-```
-Request
-  ↓
-Security Headers → HTTP Tracing → Session Loading → Auth Check → Handler
-```
-The order matters! See `src/routes/mod.rs` for the critical middleware ordering.
-
-**3. Path Management**
+**Centralized Paths**
 ```rust
-// All paths defined in one place
 paths::pages::TODOS           // "/todos"
-paths::forms::SIGN_IN         // "/forms/sign_in"
-paths::actions::TODOS_TODO_ID // "/actions/todos/{todo_id}"
-
-// Helper for parameters
 paths::with_param(paths::actions::TODOS_TODO_ID, "todo_id", &123)
-// Returns: "/actions/todos/123"
 ```
 
-**4. Authentication Flow**
+**Middleware Chain**
 ```
-Public routes   → Always accessible
-                  ↓
-Protected routes → require_authentication middleware
-                  → Checks CurrentUser extension
-                  → Redirect to sign-in if guest
-                  → Allow through if authenticated
+Request → Security Headers → HTTP Tracing → Session → Auth → Handler
 ```
 
 ### Design Principles
 
-- **Single Standard**: Same case handled the same way everywhere
-- **Explicit Over Implicit**: Required values fail fast with clear errors, no silent defaults
-- **No Path Hardcoding**: All URLs defined in `src/paths.rs`
-- **Type-First Organization**: Group by interaction type, not resource
-- **Durable Comments**: Document architecture and safety, not implementation details
+- **Single Standard** - One way to handle each case
+- **Explicit Over Implicit** - Fail fast with clear errors
+- **No Magic Values** - Constants for all repeated values
+- **Type-First Organization** - Group by interaction type
+- **No Path Hardcoding** - All URLs in `src/paths.rs`
+
+## Demo Features
+
+### Authentication Flow
+User enters email → Receives magic link → Clicks link → Authenticated (15-min token)
+
+### Payment Flow
+Upload file → View quote → Checkout → Payment verification → View result
+
+### Contact Form
+User submits inquiry → Email sent to admin (console or SMTP)
+
+## License
+
+This is a template repository - use it however you want.
