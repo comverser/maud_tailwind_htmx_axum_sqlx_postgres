@@ -1,6 +1,6 @@
 # Web App Template
 
-A minimal web application template built with Rust.
+A minimal web application template built with Rust featuring authentication, file uploads, and payment processing.
 
 ## Tech Stack
 
@@ -10,6 +10,7 @@ A minimal web application template built with Rust.
 - **Frontend**: HTMX + Tailwind CSS
 - **Sessions**: tower-sessions with PostgreSQL store
 - **Authentication**: Magic Link (passwordless)
+- **Payments**: Toss Payments integration
 
 ## Getting Started
 
@@ -38,6 +39,10 @@ BASE_URL=http://127.0.0.1:8000
 EMAIL_FROM_ADDRESS=noreply@example.com
 EMAIL_FROM_NAME="My App"
 EMAIL_MODE=console  # or "smtp" for production
+
+# Toss Payments Configuration
+TOSS_CLIENT_KEY=test_ck_CHANGE_ME
+TOSS_SECRET_KEY=test_sk_CHANGE_ME
 ```
 
 **Note**: Values with spaces must be quoted (e.g., `SITE_NAME="My App"`).
@@ -77,6 +82,55 @@ SMTP_PASSWORD=your-app-password
 ```
 Works with any SMTP provider (Gmail, SendGrid, AWS SES, etc.).
 
+## Payment Integration
+
+This template includes a complete payment flow using Toss Payments, demonstrating how to integrate payment processing in a Rust web application.
+
+### Text Analyzer Demo Feature
+
+The template includes a text analyzer feature that demonstrates the full payment workflow:
+
+1. **File Upload** - User uploads a text file (up to 10MB)
+2. **Quote Generation** - System analyzes the file and generates a price quote
+3. **Payment Checkout** - User proceeds to Toss Payments checkout
+4. **Payment Verification** - Server validates payment with Toss API
+5. **Result Display** - Successful payment shows the result page
+
+### Payment Flow Architecture
+
+```
+POST /forms/text_analyzer    → Upload file, create order
+  ↓
+GET /quote/{order_id}        → View quote with payment button
+  ↓
+POST /actions/payment/initiate → Verify order status
+  ↓
+GET /checkout/{order_id}     → Toss Payments SDK checkout page
+  ↓
+GET /actions/payment/verify  → Verify payment with Toss API
+  ↓
+GET /result/{order_id}       → Display completed order
+```
+
+### Toss Payments Setup
+
+1. Sign up at [Toss Payments](https://app.tosspayments.com/)
+2. Navigate to **Settings → API Keys**
+3. Copy your test keys:
+   - **Client Key**: Used in the browser (SDK)
+   - **Secret Key**: Used on the server (API calls)
+4. Add keys to `.env`:
+   ```bash
+   TOSS_CLIENT_KEY=test_ck_your_key_here
+   TOSS_SECRET_KEY=test_sk_your_key_here
+   ```
+
+**Security Notes:**
+- Client key is safe to expose in HTML (used by Toss SDK)
+- Secret key must never be exposed to the browser
+- Payment confirmation happens server-side for security
+- All payment amounts are verified before processing
+
 ## Core Structure
 
 This template follows a **type-first routing architecture** that organizes code by interaction type rather than by resource. This makes the application's behavior immediately clear from its URL structure.
@@ -86,16 +140,22 @@ This template follows a **type-first routing architecture** that organizes code 
 Routes are grouped by **what they do**, not **what they operate on**:
 
 ```
-GET  /                     → Render homepage
-GET  /todos                → Render todos page
-GET  /sign_in              → Render sign-in page
+GET  /                          → Render homepage
+GET  /todos                     → Render todos page
+GET  /sign_in                   → Render sign-in page
+GET  /quote/{order_id}          → Render quote page
+GET  /checkout/{order_id}       → Render checkout page
+GET  /result/{order_id}         → Render result page
 
-POST /forms/sign_in        → Process sign-in form
-POST /forms/todos          → Process new todo form
+POST /forms/sign_in             → Process sign-in form
+POST /forms/todos               → Process new todo form
+POST /forms/text_analyzer       → Process file upload
 
-POST   /actions/sign_out   → Sign out action
-DELETE /actions/todos/{id} → Delete todo action
+POST   /actions/sign_out        → Sign out action
+DELETE /actions/todos/{id}      → Delete todo action
 POST   /actions/todos/{id}/toggle → Toggle todo action
+POST   /actions/payment/initiate  → Initiate payment
+GET    /actions/payment/verify    → Verify payment callback
 ```
 
 **Why this pattern?**
