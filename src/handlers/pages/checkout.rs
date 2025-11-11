@@ -2,7 +2,7 @@ use axum::{Extension, extract::{Path, State}};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::{auth::CurrentUser, config::AppConfig, constants::errors, data::{errors::DataError, queries}, flash::FlashMessage, handlers::errors::HandlerError, views::pages};
+use crate::{auth::CurrentUser, config::AppConfig, data::queries, flash::FlashMessage, handlers::errors::HandlerError, views::pages};
 use maud::Markup;
 
 pub async fn get_checkout(
@@ -14,11 +14,7 @@ pub async fn get_checkout(
 ) -> Result<Markup, HandlerError> {
     let user_id = current_user.require_authenticated();
 
-    let order = queries::order::get_order(&db, order_id)
-        .await?
-        .ok_or(DataError::NotFound(errors::ORDER_NOT_FOUND))?;
-
-    order.verify_ownership(user_id)?;
+    let order = queries::order::get_order_for_user(&db, order_id, user_id).await?;
 
     Ok(pages::checkout::checkout(
         &current_user,

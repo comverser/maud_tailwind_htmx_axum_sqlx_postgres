@@ -1,4 +1,4 @@
-use crate::{auth::CurrentUser, constants::cdn, flash::FlashMessage, models::order::Order, paths, views::layout::base};
+use crate::{auth::CurrentUser, constants::{cdn, payment}, flash::FlashMessage, formatting::format_price, models::order::Order, paths, views::layout::base};
 use maud::{Markup, PreEscaped, html};
 
 pub fn checkout(
@@ -57,7 +57,7 @@ pub fn checkout(
                         console.log('Payment request parameters:', {{
                             amount: {},
                             orderId: '{}',
-                            orderName: 'Text Analysis - {}',
+                            orderName: '{} - {}',
                             successUrl: window.location.origin + '{}',
                             failUrl: window.location.origin + '{}'
                         }});
@@ -65,7 +65,7 @@ pub fn checkout(
                         tossPayments.requestPayment('카드', {{
                             amount: {},
                             orderId: '{}',
-                            orderName: 'Text Analysis - {}',
+                            orderName: '{} - {}',
                             successUrl: window.location.origin + '{}',
                             failUrl: window.location.origin + '{}'
                         }})
@@ -83,11 +83,13 @@ pub fn checkout(
                 client_key,
                 order.price_amount,
                 order.order_number,
+                payment::ORDER_NAME_PREFIX,
                 order.filename,
                 success_url,
                 fail_url,
                 order.price_amount,
                 order.order_number,
+                payment::ORDER_NAME_PREFIX,
                 order.filename,
                 success_url,
                 fail_url
@@ -96,15 +98,4 @@ pub fn checkout(
     };
 
     base::base_layout(current_user, flash, site_name, "Checkout", "Complete your payment", content)
-}
-
-fn format_price(amount: i32) -> String {
-    amount.to_string()
-        .as_bytes()
-        .rchunks(3)
-        .rev()
-        .map(std::str::from_utf8)
-        .collect::<Result<Vec<&str>, _>>()
-        .unwrap()
-        .join(",")
 }

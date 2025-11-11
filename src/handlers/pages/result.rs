@@ -14,11 +14,7 @@ pub async fn get_result(
 ) -> Result<Markup, HandlerError> {
     let user_id = current_user.require_authenticated();
 
-    let order = queries::order::get_order(&db, order_id)
-        .await?
-        .ok_or(DataError::NotFound(errors::ORDER_NOT_FOUND))?;
-
-    order.verify_ownership(user_id)?;
+    let order = queries::order::get_order_for_user(&db, order_id, user_id).await?;
 
     if !matches!(order.payment_status, PaymentStatus::Paid) {
         return Err(DataError::Unauthorized(errors::PAYMENT_NOT_COMPLETED).into());

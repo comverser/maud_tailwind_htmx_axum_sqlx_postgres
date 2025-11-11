@@ -6,8 +6,8 @@ use uuid::Uuid;
 use crate::{
     auth::CurrentUser,
     config::AppConfig,
-    constants::{errors, messages},
-    data::{commands, errors::DataError, queries},
+    constants::messages,
+    data::{commands, queries},
     flash::FlashMessage,
     models::order::PaymentStatus,
     paths,
@@ -27,11 +27,7 @@ pub async fn post_actions_payment_initiate(
 ) -> Result<Response, crate::handlers::errors::HandlerError> {
     let user_id = current_user.require_authenticated();
 
-    let order = queries::order::get_order(&db, form.order_id)
-        .await?
-        .ok_or(DataError::NotFound(errors::ORDER_NOT_FOUND))?;
-
-    order.verify_ownership(user_id)?;
+    let order = queries::order::get_order_for_user(&db, form.order_id, user_id).await?;
 
     if !matches!(order.payment_status, PaymentStatus::Pending) {
         return Ok(FlashMessage::error(messages::ORDER_ALREADY_PROCESSED)
@@ -70,11 +66,7 @@ pub async fn get_actions_payment_verify(
 ) -> Result<Response, crate::handlers::errors::HandlerError> {
     let user_id = current_user.require_authenticated();
 
-    let order = queries::order::get_order_by_order_number(&db, &query.order_id)
-        .await?
-        .ok_or(DataError::NotFound(errors::ORDER_NOT_FOUND))?;
-
-    order.verify_ownership(user_id)?;
+    let order = queries::order::get_order_by_order_number_for_user(&db, &query.order_id, user_id).await?;
 
     if query.amount != order.price_amount {
         tracing::error!("Payment amount mismatch: expected {}, got {}", order.price_amount, query.amount);

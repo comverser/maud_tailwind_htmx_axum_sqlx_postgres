@@ -35,6 +35,7 @@ pub mod errors {
     pub const NOT_YOUR_ORDER: &str = "Not your order";
     pub const NO_FILE_PROVIDED: &str = "No file provided";
     pub const NO_FILE_CONTENT: &str = "No file content";
+    pub const USER_NOT_FOUND: &str = "User not found";
 }
 
 pub mod pricing {
@@ -44,6 +45,7 @@ pub mod pricing {
 
 pub mod payment {
     pub const TOSS_API_CONFIRM_URL: &str = "https://api.tosspayments.com/v1/payments/confirm";
+    pub const ORDER_NAME_PREFIX: &str = "Text Analysis";
 }
 
 pub mod file_upload {

@@ -1,7 +1,7 @@
 use crate::{
     auth::CurrentUser,
     flash::FlashMessage,
-    models::order::{OrderStats, OrderSummary, PaymentStatus},
+    models::order::{OrderStats, OrderSummary},
     paths,
     views::layout::base::base_layout,
 };
@@ -74,19 +74,8 @@ fn stat_card(label: &str, value: &str, color_class: &str) -> Markup {
 }
 
 fn order_row(order: &OrderSummary) -> Markup {
-    let status_class = match order.payment_status {
-        PaymentStatus::Paid => "text-green-600 bg-green-50",
-        PaymentStatus::Pending => "text-yellow-600 bg-yellow-50",
-        PaymentStatus::Failed => "text-red-600 bg-red-50",
-        PaymentStatus::Cancelled => "text-gray-600 bg-gray-50",
-    };
-
-    let status_text = match order.payment_status {
-        PaymentStatus::Paid => "Paid",
-        PaymentStatus::Pending => "Pending",
-        PaymentStatus::Failed => "Failed",
-        PaymentStatus::Cancelled => "Cancelled",
-    };
+    let status_class = order.payment_status.css_class();
+    let status_text = order.payment_status.display_text();
 
     let formatted_date = order.created_at
         .format(&Rfc3339)

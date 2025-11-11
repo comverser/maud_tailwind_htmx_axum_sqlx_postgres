@@ -6,6 +6,7 @@ use crate::{
     constants::{errors, file_upload, pricing},
     data::{commands, errors::DataError},
     flash::FlashMessage,
+    models::order::Order,
     paths,
 };
 use tower_sessions::Session;
@@ -58,7 +59,7 @@ pub async fn post_forms_text_analyzer(
     let calculated_price = text_length * pricing::PRICE_PER_CHARACTER;
     let price_amount = calculated_price.max(pricing::MINIMUM_ORDER_AMOUNT);
 
-    let order_number = format!("ORD-{}-{}", user_id, uuid::Uuid::new_v4().to_string().split('-').next().unwrap());
+    let order_number = Order::generate_order_number(user_id);
 
     let order = commands::order::create_order(
         &db,

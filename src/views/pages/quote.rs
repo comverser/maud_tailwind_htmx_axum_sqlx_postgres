@@ -1,4 +1,4 @@
-use crate::{auth::CurrentUser, flash::FlashMessage, models::order::Order, paths, views::layout::base::base_layout};
+use crate::{auth::CurrentUser, flash::FlashMessage, formatting::format_price, models::order::Order, paths, views::layout::base::base_layout};
 use maud::{Markup, html};
 
 pub fn quote(
@@ -57,15 +57,4 @@ fn format_file_size(bytes: i32) -> String {
     } else {
         format!("{:.2} MB", bytes / (1024.0 * 1024.0))
     }
-}
-
-fn format_price(amount: i32) -> String {
-    amount.to_string()
-        .as_bytes()
-        .rchunks(3)
-        .rev()
-        .map(std::str::from_utf8)
-        .collect::<Result<Vec<&str>, _>>()
-        .unwrap()
-        .join(",")
 }

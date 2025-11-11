@@ -10,6 +10,7 @@ mod data;
 mod email;
 mod email_templates;
 mod flash;
+mod formatting;
 mod handlers;
 mod init;
 mod magic_link;

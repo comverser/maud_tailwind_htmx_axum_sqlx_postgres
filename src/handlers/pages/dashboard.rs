@@ -22,7 +22,7 @@ pub async fn get_dashboard(
 
     let email = queries::user::get_user_email(&db, user_id)
         .await?
-        .ok_or(DataError::NotFound(errors::ORDER_NOT_FOUND))?;
+        .ok_or(DataError::NotFound(errors::USER_NOT_FOUND))?;
 
     let (stats, recent_orders) = tokio::try_join!(
         queries::order::get_order_stats_for_user(&db, user_id),

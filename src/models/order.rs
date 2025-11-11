@@ -13,6 +13,26 @@ pub enum PaymentStatus {
     Cancelled,
 }
 
+impl PaymentStatus {
+    pub fn display_text(&self) -> &'static str {
+        match self {
+            Self::Paid => "Paid",
+            Self::Pending => "Pending",
+            Self::Failed => "Failed",
+            Self::Cancelled => "Cancelled",
+        }
+    }
+
+    pub fn css_class(&self) -> &'static str {
+        match self {
+            Self::Paid => "text-green-600 bg-green-50",
+            Self::Pending => "text-yellow-600 bg-yellow-50",
+            Self::Failed => "text-red-600 bg-red-50",
+            Self::Cancelled => "text-gray-600 bg-gray-50",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Order {
     pub order_id: Uuid,
@@ -36,6 +56,15 @@ impl Order {
         } else {
             Ok(())
         }
+    }
+
+    pub fn generate_order_number(user_id: i32) -> String {
+        let uuid_string = Uuid::new_v4().to_string();
+        let uuid_prefix = uuid_string
+            .split('-')
+            .next()
+            .expect("UUID should have at least one segment");
+        format!("ORD-{}-{}", user_id, uuid_prefix)
     }
 }
 
