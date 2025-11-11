@@ -12,6 +12,47 @@ A minimal web application template built with Rust featuring authentication, fil
 - **Authentication**: Magic Link (passwordless)
 - **Payments**: Toss Payments integration
 
+## Key Features
+
+### 🔐 Passwordless Authentication
+Magic link authentication system that eliminates password management:
+- Email-based sign-in (no passwords to remember)
+- Secure token generation with 15-minute expiry
+- Automatic user account creation
+- Session management with PostgreSQL store
+
+### 📧 Email Services
+Flexible email system supporting both development and production:
+- **Console mode** for development (logs emails to terminal)
+- **SMTP mode** for production (supports any SMTP provider)
+- Magic link delivery for authentication
+- Contact form with inquiry submissions to admin
+
+### 💳 Payment Processing
+Complete payment integration with Toss Payments:
+- File upload and text analysis demo workflow
+- Dynamic pricing calculation (per-character with minimum amount)
+- Secure server-side payment verification
+- Order tracking with payment status management
+- Payment success/failure handling with user feedback
+
+### 📁 File Upload & Analysis
+File processing demonstration feature:
+- Multipart form file uploads (up to 10MB)
+- UTF-8 text content extraction and analysis
+- Character count and price calculation
+- File metadata storage (filename, size, content)
+- Order generation with unique order numbers
+
+### 🏗️ Production-Ready Architecture
+Clean, maintainable codebase following best practices:
+- Type-first routing (pages/forms/actions separation)
+- CQRS pattern for database operations
+- Centralized path management (no hardcoded URLs)
+- Security headers and CSRF protection
+- Comprehensive error handling
+- Structured logging with tracing
+
 ## Getting Started
 
 ### 1. Set up PostgreSQL database
