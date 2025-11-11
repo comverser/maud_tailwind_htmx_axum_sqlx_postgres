@@ -91,8 +91,14 @@ fn order_row(order: &OrderSummary) -> Markup {
     let formatted_date = order.created_at
         .format(&Rfc3339)
         .unwrap_or_else(|_| String::from("Invalid date"));
-    let date_parts: Vec<&str> = formatted_date.split('T').collect();
-    let date_display = date_parts.first().unwrap_or(&"");
+    let datetime_parts: Vec<&str> = formatted_date.split('T').collect();
+    let date_part = datetime_parts.first().unwrap_or(&"");
+    let time_part = datetime_parts.get(1).and_then(|t| t.split('.').next()).unwrap_or("");
+    let date_display = if !time_part.is_empty() {
+        format!("{} {}", date_part, time_part)
+    } else {
+        date_part.to_string()
+    };
 
     html! {
         tr class="border-b hover:bg-gray-50" {
