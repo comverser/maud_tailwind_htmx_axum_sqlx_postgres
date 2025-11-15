@@ -12,7 +12,7 @@ use crate::{
     flash::FlashMessage,
     models::contact::{ContactForm, FIELD_EMAIL, FIELD_MESSAGE},
     paths,
-    views::pages::root,
+    views::pages,
 };
 
 use super::parse_validation_errors;
@@ -61,7 +61,7 @@ fn render_validation_errors(
     let email_to_show = user_email.as_deref().or(Some(&form.email));
     (
         StatusCode::BAD_REQUEST,
-        root::root(
+        pages::root(
             current_user,
             None,
             site_name,

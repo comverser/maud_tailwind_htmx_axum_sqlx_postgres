@@ -4,7 +4,7 @@ use axum::{
 };
 use thiserror::Error;
 
-use crate::{auth::CurrentUser, constants::error_pages, data::errors::DataError, views::pages::server_error};
+use crate::{auth::CurrentUser, constants::error_pages, data::errors::DataError, views::pages};
 
 /// Type alias for handler results, defaulting to Response.
 pub type HandlerResult<T = Response> = Result<T, HandlerError>;
@@ -37,6 +37,6 @@ impl IntoResponse for HandlerError {
             }
         };
 
-        (status, server_error::server_error(&CurrentUser::Guest, None, error_pages::FALLBACK_SITE_NAME, message)).into_response()
+        (status, pages::server_error(&CurrentUser::Guest, None, error_pages::FALLBACK_SITE_NAME, message)).into_response()
     }
 }

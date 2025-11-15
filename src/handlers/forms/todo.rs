@@ -12,7 +12,7 @@ use crate::{
     handlers::errors::HandlerError,
     models::todo::{CreateTodoForm, FIELD_TASK},
     paths::pages,
-    views::pages::todos,
+    views::pages as view,
 };
 
 use super::parse_validation_errors;
@@ -49,7 +49,7 @@ async fn render_validation_errors(
 
     Ok((
         StatusCode::BAD_REQUEST,
-        todos::todos(
+        view::todos(
             current_user,
             None,
             site_name,

@@ -12,7 +12,7 @@ use crate::{
     magic_link,
     models::user::{FIELD_EMAIL, MagicLinkRequestForm},
     paths,
-    views::pages::sign_in,
+    views::pages,
 };
 use tower_sessions::Session;
 
@@ -53,7 +53,7 @@ fn render_validation_errors(
     let errors = parse_validation_errors(validation_errors);
     (
         StatusCode::BAD_REQUEST,
-        sign_in::sign_in(
+        pages::sign_in(
             current_user,
             None,
             site_name,

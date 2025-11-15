@@ -1,11 +1,23 @@
 pub mod admin;
-pub mod checkout;
-pub mod dashboard;
-pub mod not_found;
-pub mod quote;
-pub mod result;
-pub mod root;
-pub mod server_error;
-pub mod sign_in;
-pub mod text_analyzer;
-pub mod todos;
+
+mod checkout;
+mod dashboard;
+mod not_found;
+mod quote;
+mod result;
+mod root;
+mod server_error;
+mod sign_in;
+mod text_analyzer;
+mod todos;
+
+pub use checkout::checkout;
+pub use dashboard::dashboard;
+pub use not_found::not_found;
+pub use quote::quote;
+pub use result::result;
+pub use root::root;
+pub use server_error::server_error;
+pub use sign_in::sign_in;
+pub use text_analyzer::text_analyzer;
+pub use todos::{todo_item, todos};

@@ -8,5 +8,5 @@ pub async fn handle_404(
     Extension(current_user): Extension<CurrentUser>,
     Extension(flash): Extension<Option<FlashMessage>>,
 ) -> (StatusCode, Markup) {
-    (StatusCode::NOT_FOUND, pages::not_found::not_found(&current_user, flash.as_ref(), config.site_name()))
+    (StatusCode::NOT_FOUND, pages::not_found(&current_user, flash.as_ref(), config.site_name()))
 }

@@ -16,7 +16,7 @@ pub async fn get_checkout(
 
     let order = queries::order::get_order_for_user(&db, order_id, user_id).await?;
 
-    Ok(pages::checkout::checkout(
+    Ok(pages::checkout(
         &current_user,
         flash.as_ref(),
         config.site_name(),

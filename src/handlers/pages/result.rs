@@ -20,5 +20,5 @@ pub async fn get_result(
         return Err(DataError::Unauthorized(errors::PAYMENT_NOT_COMPLETED).into());
     }
 
-    Ok(pages::result::result(&current_user, flash.as_ref(), config.site_name(), &order))
+    Ok(pages::result(&current_user, flash.as_ref(), config.site_name(), &order))
 }

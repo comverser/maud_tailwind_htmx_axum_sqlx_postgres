@@ -21,7 +21,7 @@ pub async fn get_dashboard(
 
     let recent_orders = queries::order::get_orders_for_user(&db, user_id, 10).await?;
 
-    Ok(pages::dashboard::dashboard(
+    Ok(pages::dashboard(
         &current_user,
         flash.as_ref(),
         config.site_name(),

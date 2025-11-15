@@ -16,5 +16,5 @@ pub async fn get_root(
         CurrentUser::Guest => None,
     };
 
-    Ok(pages::root::root(&current_user, flash.as_ref(), config.site_name(), user_email.as_deref(), None, None, None))
+    Ok(pages::root(&current_user, flash.as_ref(), config.site_name(), user_email.as_deref(), None, None, None))
 }

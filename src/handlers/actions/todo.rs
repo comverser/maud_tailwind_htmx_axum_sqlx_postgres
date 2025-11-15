@@ -5,7 +5,7 @@ use crate::{
     auth::CurrentUser,
     data::commands,
     handlers::{errors::HandlerError, htmx},
-    views::pages::todos,
+    views::pages,
 };
 
 pub async fn delete_actions_todos_todo_id(
@@ -28,5 +28,5 @@ pub async fn patch_actions_todos_todo_id_toggle(
     let user_id = current_user.require_authenticated();
 
     let todo = commands::todo::toggle_todo_returning(&db, user_id, todo_id).await?;
-    Ok(htmx::swap_html(todos::todo_item(&todo)))
+    Ok(htmx::swap_html(pages::todo_item(&todo)))
 }

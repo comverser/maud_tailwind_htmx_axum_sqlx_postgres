@@ -16,5 +16,5 @@ pub async fn get_quote(
 
     let order = queries::order::get_order_for_user(&db, order_id, user_id).await?;
 
-    Ok(pages::quote::quote(&current_user, flash.as_ref(), config.site_name(), &order))
+    Ok(pages::quote(&current_user, flash.as_ref(), config.site_name(), &order))
 }
