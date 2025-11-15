@@ -47,6 +47,7 @@ impl PaymentStatus {
 pub struct Order {
     pub order_id: Uuid,
     pub user_id: i32,
+    pub user_email: String,
     pub filename: String,
     pub file_size: i32,
     pub text_content: String,

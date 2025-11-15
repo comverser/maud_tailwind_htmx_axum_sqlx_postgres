@@ -5,6 +5,7 @@ use crate::{data::errors::DataError, models::order::{Order, PaymentStatus}};
 
 pub struct CreateOrderParams {
     pub user_id: i32,
+    pub user_email: String,
     pub filename: String,
     pub file_size: i32,
     pub text_content: String,
@@ -17,11 +18,12 @@ pub async fn create_order(db: &PgPool, params: CreateOrderParams) -> Result<Orde
     let order = sqlx::query_as!(
         Order,
         r#"
-        INSERT INTO orders(user_id, filename, file_size, text_content, text_length, price_amount, payment_status, order_number)
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO orders(user_id, user_email, filename, file_size, text_content, text_length, price_amount, payment_status, order_number)
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING
             order_id,
             user_id,
+            user_email,
             filename,
             file_size,
             text_content,
@@ -34,6 +36,7 @@ pub async fn create_order(db: &PgPool, params: CreateOrderParams) -> Result<Orde
             paid_at
         "#,
         params.user_id,
+        params.user_email,
         params.filename,
         params.file_size,
         params.text_content,
@@ -63,6 +66,7 @@ pub async fn update_order_payment(
         RETURNING
             order_id,
             user_id,
+            user_email,
             filename,
             file_size,
             text_content,

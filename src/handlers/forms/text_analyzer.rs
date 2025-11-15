@@ -17,7 +17,10 @@ pub async fn post_forms_text_analyzer(
     session: Session,
     mut multipart: Multipart,
 ) -> Result<Response, crate::handlers::errors::HandlerError> {
-    let user_id = current_user.require_authenticated();
+    let (user_id, user_email) = match &current_user {
+        CurrentUser::Authenticated { user_id, email, .. } => (*user_id, email.clone()),
+        CurrentUser::Guest => unreachable!("Protected route accessed by guest"),
+    };
 
     let mut filename: Option<String> = None;
     let mut file_size: Option<usize> = None;
@@ -65,6 +68,7 @@ pub async fn post_forms_text_analyzer(
         &db,
         commands::order::CreateOrderParams {
             user_id,
+            user_email,
             filename,
             file_size,
             text_content,

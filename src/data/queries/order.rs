@@ -10,6 +10,7 @@ pub async fn get_order(db: &PgPool, order_id: Uuid) -> Result<Option<Order>, Dat
         SELECT
             order_id,
             user_id,
+            user_email,
             filename,
             file_size,
             text_content,
@@ -38,6 +39,7 @@ pub async fn get_order_by_order_number(db: &PgPool, order_number: &str) -> Resul
         SELECT
             order_id,
             user_id,
+            user_email,
             filename,
             file_size,
             text_content,
